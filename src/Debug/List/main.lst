@@ -1,0 +1,202 @@
+###############################################################################
+#                                                                             #
+# IAR ANSI C/C++ Compiler V6.50.3.4676/W32 for ARM      06/Sep/2015  14:47:44 #
+# Copyright 1999-2013 IAR Systems AB.                                         #
+#                                                                             #
+#    Cpu mode     =  thumb                                                    #
+#    Endian       =  little                                                   #
+#    Source file  =  D:\delo\x\press100\trunk\src\main.c                      #
+#    Command line =  D:\delo\x\press100\trunk\src\main.c -D VECT_TAB_FLASH    #
+#                    -D IAR_ARM_CM3 -lcN D:\delo\x\press100\trunk\src\Debug\L #
+#                    ist\ --diag_suppress Pa082,pe191 -o                      #
+#                    D:\delo\x\press100\trunk\src\Debug\Obj\ --no_cse         #
+#                    --no_unroll --no_inline --no_code_motion --no_tbaa       #
+#                    --no_clustering --no_scheduling --debug --endian=little  #
+#                    --cpu=Cortex-M3 -e --fpu=None --dlib_config "C:\Program  #
+#                    Files (x86)\IAR Systems\Embedded Workbench               #
+#                    6.5\arm\INC\c\DLib_Config_Full.h" -I                     #
+#                    D:\delo\x\press100\trunk\src\.\ -I                       #
+#                    D:\delo\x\press100\trunk\src\STM32F10xFWLib\inc\ -I      #
+#                    D:\delo\x\press100\trunk\src\FreeRTOS\Source\include\    #
+#                    -I D:\delo\x\press100\trunk\src\FreeRTOS\Source\portable #
+#                    \IAR\ARM_CM3\ -I D:\delo\x\press100\trunk\src\common\inc #
+#                    lude\ -Ol --use_c++_inline                               #
+#    List file    =  D:\delo\x\press100\trunk\src\Debug\List\main.lst         #
+#    Object file  =  D:\delo\x\press100\trunk\src\Debug\Obj\main.o            #
+#                                                                             #
+#                                                                             #
+###############################################################################
+
+D:\delo\x\press100\trunk\src\main.c
+      1          // main.c
+      2          
+      3          /* Standard includes. */
+      4          #include <stdio.h>
+      5          
+      6          /* Scheduler includes. */
+      7          #include "FreeRTOS.h"
+      8          #include "task.h"
+      9          #include "queue.h"
+     10          
+     11          /* Library includes. */
+     12          #include "stm32f10x_it.h"
+     13          #include "stm32f10x_gpio.h"
+     14          #include "stm32f10x_adc.h"
+     15          #include "stm32f10x_map.h"
+     16          
+     17          #include "types.h"
+     18          #include "buttonHandler.h"
+     19          #include "ledHandler.h"
+     20          #include "terminal.h"
+     21          #include "mainLogic.h"
+     22          #include "pressure.h"
+     23          #include "solenoidHendler.h"
+     24          
+     25          
+     26          #include "stm32f10x_rcc.h"
+     27          #include "stm32f10x_map.h"
+     28          
+     29          #include "report.h"
+     30          
+     31          //------------------------------------------------------------------------------
+     32          
+     33          //------------------------------------------------------------------------------
+     34          
+     35          void initRCC (void)
+     36          {
+     37              /* Start with the clocks in their expected state. */
+     38              RCC_DeInit();
+     39          
+     40              /* Enable HSE (high speed external clock). */
+     41              RCC_HSEConfig( RCC_HSE_ON );
+     42          
+     43              /* Wait till HSE is ready. */
+     44              while( RCC_GetFlagStatus( RCC_FLAG_HSERDY ) == RESET )
+     45              {
+     46              }
+     47          
+     48              /* 2 wait states required on the flash. */
+     49              *( ( unsigned long * ) 0x40022000 ) = 0x02;
+     50          
+     51              /* HCLK = SYSCLK */
+     52              RCC_HCLKConfig( RCC_SYSCLK_Div1 );
+     53          
+     54              /* PCLK2 = HCLK */
+     55              RCC_PCLK2Config( RCC_HCLK_Div1 );
+     56          
+     57              /* PCLK1 = HCLK/2 */
+     58              RCC_PCLK1Config( RCC_HCLK_Div1 );
+     59          
+     60              /* PLLCLK = 8MHz * 9 = 72 MHz. */
+     61              RCC_PLLConfig( RCC_PLLSource_HSE_Div1, RCC_PLLMul_9 );
+     62          
+     63              /* Enable PLL. */
+     64              RCC_PLLCmd( ENABLE );
+     65          
+     66              /* Wait till PLL is ready. */
+     67              while(RCC_GetFlagStatus(RCC_FLAG_PLLRDY) == RESET)
+     68              {
+     69              }
+     70          
+     71              /* Select PLL as system clock source. */
+     72              RCC_SYSCLKConfig( RCC_SYSCLKSource_PLLCLK );
+     73          
+     74              /* Wait till PLL is used as system clock source. */
+     75              while( RCC_GetSYSCLKSource() != 0x08 )
+     76              {
+     77              }
+     78          
+     79               // Enable GPIO clock and release reset.
+     80              RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC, ENABLE);
+     81              RCC_APB2PeriphResetCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC, DISABLE);
+     82          }
+     83          
+     84          static void prvSetupHardware( void )
+     85          {
+     86              initRCC();
+     87          }
+     88          
+     89          //------------------------------------------------------------------------------
+     90          int main( void )
+     91          {
+     92          #ifdef DEBUG
+     93              debug();
+     94          #endif
+     95          
+     96              prvSetupHardware();
+     97          
+     98              buttonHandler();    // Обработчик кнопок
+     99              ledHandler();       // Обработчик светодиодов
+    100              terminalHandler();  // Обработчик терминалки
+    101              mainLogicHandler(); // Главный обработчик логики
+    102              pressureHandler();  // Обработчик давления
+    103              solenoidHandler();  // Обработчик соленоидов
+    104          
+    105              // Start the scheduler.
+    106              vTaskStartScheduler();
+    107          
+    108              // Will only get here if there was not enough heap space to create the
+    109              // idle task.
+    110              return 0;
+    111          }
+    112          
+    113          //------------------------------------------------------------------------------
+    114          #ifdef  DEBUG
+    115          /* Keep the linker happy. */
+    116          void assert_failed( unsigned char* pcFile, unsigned long ulLine )
+    117          {
+    118          	for( ;; )
+    119          	{
+    120          	}
+    121          }
+    122          #endif
+
+   Maximum stack usage in bytes:
+
+   .cstack Function
+   ------- --------
+       0   assert_failed
+       8   initRCC
+         8   -> RCC_APB2PeriphClockCmd
+         8   -> RCC_APB2PeriphResetCmd
+         8   -> RCC_DeInit
+         8   -> RCC_GetFlagStatus
+         8   -> RCC_GetSYSCLKSource
+         8   -> RCC_HCLKConfig
+         8   -> RCC_HSEConfig
+         8   -> RCC_PCLK1Config
+         8   -> RCC_PCLK2Config
+         8   -> RCC_PLLCmd
+         8   -> RCC_PLLConfig
+         8   -> RCC_SYSCLKConfig
+       8   main
+         8   -> buttonHandler
+         8   -> debug
+         8   -> ledHandler
+         8   -> mainLogicHandler
+         8   -> pressureHandler
+         8   -> prvSetupHardware
+         8   -> solenoidHandler
+         8   -> terminalHandler
+         8   -> vTaskStartScheduler
+       8   prvSetupHardware
+         8   -> initRCC
+
+
+   Section sizes:
+
+   Bytes  Function/Label
+   -----  --------------
+       4  ??DataTable0
+       2  assert_failed
+     108  initRCC
+      42  main
+       8  prvSetupHardware
+
+ 
+ 164 bytes in section .text
+ 
+ 164 bytes of CODE memory
+
+Errors: none
+Warnings: none
