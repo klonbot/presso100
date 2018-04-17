@@ -212,7 +212,7 @@ void working_handler(void)
     u32 pressure = getPressure();
     u32 maxPressure = getMaxPressure();
     if (m_work_cycle)
-    {   // цикл накачки     
+    {   // цикл накачки
         if(pressure < maxPressure)
         //if (m_pumping_cnt<10)
         {
@@ -339,6 +339,19 @@ void blinkLed(u32 ledInd)
         state = !state;
 }
 
+void ledD2Control(void)
+{
+    static u32 blink_cnt = 0;
+    static u32 state = 0;
+
+    setLedState(state, led_D2);
+
+    blink_cnt++;
+    blink_cnt = blink_cnt%60;
+    if (!blink_cnt)
+        state = !state;
+}
+
 //------------------------------------------------------------------------------
 /**
  * Управление светодиодами
@@ -371,6 +384,8 @@ void ledControl(void)
         setLedsPowerLavel(PowerLevel);
     else
         blinkLed(m_mode); // мигание светодиода выбранного режима
+
+    ledD2Control();
 }
 
 //------------------------------------------------------------------------------

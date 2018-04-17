@@ -48,6 +48,9 @@
 #define PORT_LED_3          GPIOA
 #define PIN_LED_3           GPIO_Pin_6
 
+#define PORT_LED_D2         GPIOC
+#define PIN_LED_D2          GPIO_Pin_13
+
 //------------------------------------------------------------------------------
 
 #define MAX_NUM_LEDS 15
@@ -142,8 +145,10 @@ void ledHandler(void)
     createLed(PORT_LED_2, PIN_LED_2, led_2);
     createLed(PORT_LED_3, PIN_LED_3, led_3);
 
+    createLed(PORT_LED_D2, PIN_LED_D2, led_D2);
+
     // инициализация светодиодов
-    xTaskCreate( ledTask, "buttons", configMINIMAL_STACK_SIZE, NULL, LED_PRIORITY, NULL );
+    xTaskCreate( ledTask, "led", configMINIMAL_STACK_SIZE, NULL, LED_PRIORITY, NULL );
 }
 
 /**
