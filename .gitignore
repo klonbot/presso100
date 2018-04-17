@@ -1,0 +1,10 @@
+
+src/Debug/Obj/
+
+src/Debug/Exe/
+
+nbproject/
+
+*.dep
+
+*.dni
