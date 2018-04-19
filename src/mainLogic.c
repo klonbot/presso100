@@ -44,7 +44,7 @@ current_mode_t m_current_mode = cm_readyuse;
 u32 m_pumpState = 0;
 u32 m_minivalveState = 0;
 u32 m_reliefvalveState = 0;
-u32 m_mode = 0;                 // режим процедуры
+u32 m_mode = 1;                 // режим процедуры
 
 u32 m_cycles_cnt = 0;
 u32 m_pumping_cnt = 0;          // счетчик накачки
