@@ -24,18 +24,18 @@
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin;
     GPIO_Init(GPIOx, &GPIO_InitStructure);
 }*/
-
-#define PORT_CHANNEL1     GPIOC
-#define PIN_CHANNEL1      GPIO_Pin_9
-
-#define PORT_CHANNEL2     GPIOC
-#define PIN_CHANNEL2      GPIO_Pin_7
-
+// помпа
+#define PORT_CHANNEL1     GPIOB
+#define PIN_CHANNEL1      GPIO_Pin_15
+// клапан накачки
+#define PORT_CHANNEL2     GPIOB
+#define PIN_CHANNEL2      GPIO_Pin_14
+//
 #define PORT_CHANNEL3     GPIOB
-#define PIN_CHANNEL3      GPIO_Pin_15
-
+#define PIN_CHANNEL3      GPIO_Pin_13
+//
 #define PORT_CHANNEL4     GPIOB
-#define PIN_CHANNEL4      GPIO_Pin_13
+#define PIN_CHANNEL4      GPIO_Pin_12
 
 //------------------------------------------------------------------------------
 

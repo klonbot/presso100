@@ -18,27 +18,27 @@
 
 //------------------------------------------------------------------------------
 
-#define PORT_LED_LEVEL1     GPIOB
-#define PIN_LED_LEVEL1      GPIO_Pin_10
+#define PORT_LED_LEVEL1     GPIOA
+#define PIN_LED_LEVEL1      GPIO_Pin_2
 
-#define PORT_LED_LEVEL2     GPIOB
-#define PIN_LED_LEVEL2      GPIO_Pin_1
+#define PORT_LED_LEVEL2     GPIOA
+#define PIN_LED_LEVEL2      GPIO_Pin_3
 
-#define PORT_LED_LEVEL3     GPIOC
-#define PIN_LED_LEVEL3      GPIO_Pin_5
+#define PORT_LED_LEVEL3     GPIOA
+#define PIN_LED_LEVEL3      GPIO_Pin_4
 
 #define PORT_LED_LEVEL4     GPIOA
-#define PIN_LED_LEVEL4      GPIO_Pin_7
+#define PIN_LED_LEVEL4      GPIO_Pin_5
 
 #define PORT_LED_LEVEL5     GPIOA
-#define PIN_LED_LEVEL5      GPIO_Pin_5
+#define PIN_LED_LEVEL5      GPIO_Pin_6
 
 #define PORT_LED_WARNING    GPIOB
-#define PIN_LED_WARNING     GPIO_Pin_12
+#define PIN_LED_WARNING     GPIO_Pin_5
 
 #define PORT_LED_START      GPIOB
-#define PIN_LED_START       GPIO_Pin_14
-
+#define PIN_LED_START       GPIO_Pin_6
+/*
 #define PORT_LED_1          GPIOA // Level 5
 #define PIN_LED_1           GPIO_Pin_4
 
@@ -47,7 +47,7 @@
 
 #define PORT_LED_3          GPIOA
 #define PIN_LED_3           GPIO_Pin_6
-
+*/
 #define PORT_LED_D2         GPIOC
 #define PIN_LED_D2          GPIO_Pin_13
 
@@ -141,9 +141,9 @@ void ledHandler(void)
     createLed(PORT_LED_WARNING, PIN_LED_WARNING, led_warning);
     createLed(PORT_LED_START, PIN_LED_START, led_start);
 
-    createLed(PORT_LED_1, PIN_LED_1, led_1);
-    createLed(PORT_LED_2, PIN_LED_2, led_2);
-    createLed(PORT_LED_3, PIN_LED_3, led_3);
+    //createLed(PORT_LED_1, PIN_LED_1, led_1);
+    //createLed(PORT_LED_2, PIN_LED_2, led_2);
+    //createLed(PORT_LED_3, PIN_LED_3, led_3);
 
     createLed(PORT_LED_D2, PIN_LED_D2, led_D2);
 
