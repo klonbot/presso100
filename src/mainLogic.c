@@ -152,6 +152,7 @@ void StartStop (void)
 u32 getMaxPressure(void)
 {
     u32 maxPressure = 0;
+#if 0
     switch(PowerLevel)
     {
         case 0:
@@ -170,6 +171,26 @@ u32 getMaxPressure(void)
             maxPressure = (0 == m_mode) ? 220 : 180;
             break;
     };
+#endif
+    switch(PowerLevel)
+    {
+        case 0:
+            maxPressure = (0 == m_mode) ? 120 : 120;
+            break;
+        case 1:
+            maxPressure = (0 == m_mode) ? 125 : 125;
+            break;
+        case 2:
+            maxPressure = (0 == m_mode) ? 130 : 130;
+            break;
+        case 3:
+            maxPressure = (0 == m_mode) ? 135 : 135;
+            break;
+        case 4:
+            maxPressure = (0 == m_mode) ? 140 : 140;
+            break;
+    };
+
     return maxPressure;
 }
 
@@ -195,8 +216,8 @@ void pumping_handler(void)
         m_work_cycle = 1; // начинает с режима накачки
         //m_pumping_cnt = 0;
     }
-    // TODO: добавить ограничение по времени накачки 40 секунд
-    if (m_cycles_cnt > SECOND_TO_CYKLE(40)) // 40 секунд
+    // TODO: добавить ограничение по времени накачки
+    if (m_cycles_cnt > SECOND_TO_CYKLE(120))
     {
         m_current_mode = cm_error;
         m_cycles_cnt = 0;
@@ -212,7 +233,7 @@ void working_handler(void)
     u32 pressure = getPressure();
     u32 maxPressure = getMaxPressure();
     if (m_work_cycle)
-    {   // цикл накачки     
+    {   // цикл накачки
         if(pressure < maxPressure)
         //if (m_pumping_cnt<10)
         {
@@ -248,7 +269,6 @@ void working_handler(void)
     }
     else
     { // цикл сброса
-        u32 relax_decim = (0 == m_mode) ? 2 : 4;
         if (pressure > maxPressure)
         {
             m_pumpState = 0;        // выключение помпы
@@ -263,8 +283,8 @@ void working_handler(void)
         }
     }
 
-    u32 second_limit = (0 == m_mode) ?  25 : 50;
-    if (m_cycles_cnt > SECOND_TO_CYKLE(second_limit)) // 25 секунд
+    u32 second_limit = (0 == m_mode) ?  100 : 200;
+    if (m_cycles_cnt > SECOND_TO_CYKLE(second_limit)) 
     {
         m_current_mode = cm_error;
         m_cycles_cnt = 0;
