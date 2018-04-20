@@ -35,6 +35,23 @@ typedef enum
     cm_working,         // работа режима
 } current_mode_t;       // текущий режим
 
+typedef enum
+{
+    workMode_presso = 0,
+    workMode_vibro = 1,
+    workMode_vibroTime = 2,
+
+    workMode_num
+} workMode_t;
+
+typedef enum
+{
+    vibroTimeStep_vibroPumping,
+    vibroTimeStep_relief,
+
+    vibroTimeStep_num
+} vibroTimeStep_t;
+
 //------------------------------------------------------------------------------
 
 volatile unsigned int PowerLevel = 0;   // уровень мощности
@@ -43,14 +60,15 @@ current_mode_t m_current_mode = cm_readyuse;
 
 u32 m_pumpState = 0;
 u32 m_minivalveState = 0;
-u32 m_reliefvalveState = 0;
-u32 m_mode = 1;                 // режим процедуры
+u32 m_reliefValveState = 0;
+workMode_t m_workMode = workMode_vibroTime;
 
 u32 m_cycles_cnt = 0;
 u32 m_pumping_cnt = 0;          // счетчик накачки
 u32 m_work_cycle = 0;           // цикл работы
 u32 m_pulse_mode_cnt = 0;       // счетчик импульсного режима
 
+vibroTimeStep_t m_vibroTimeStep = vibroTimeStep_relief;
 
 //------------------------------------------------------------------------------
 /**
@@ -93,7 +111,10 @@ void PowerLavelUp (void)
     }
     else
     {
-        m_mode = 1;
+        if (m_workMode < (workMode_t)((u32)workMode_num-1))
+        {
+            m_workMode = (workMode_t)((u32)(m_workMode)+1);
+        }
     }
 }
 
@@ -111,7 +132,10 @@ void PowerLavelDown (void)
     }
     else
     {
-        m_mode = 0;
+        if (m_workMode != (workMode_t)0)
+        {
+            m_workMode = (workMode_t)((u32)m_workMode-1);
+        }
     }
 }
 
@@ -123,10 +147,20 @@ void StartStop (void)
 {
     m_cycles_cnt = 0;
     PowerLevel = 0;
+    m_vibroTimeStep = vibroTimeStep_vibroPumping;
     switch(m_current_mode)
     {
         case cm_readyuse:
-            m_current_mode = cm_pumping;
+            switch (m_workMode)
+            {
+            case workMode_presso:
+            case workMode_vibro:
+                m_current_mode = cm_pumping;
+                break;
+            case workMode_vibroTime:
+                m_current_mode = cm_working;
+                break;
+            }
             break;
         case cm_error:
             m_current_mode = cm_readyuse;
@@ -152,42 +186,22 @@ void StartStop (void)
 u32 getMaxPressure(void)
 {
     u32 maxPressure = 0;
-#if 0
     switch(PowerLevel)
     {
         case 0:
-            maxPressure = (0 == m_mode) ? 140 : 140;
+            maxPressure = (0 == m_workMode) ? 120 : 120;
             break;
         case 1:
-            maxPressure = (0 == m_mode) ? 160 : 150;
+            maxPressure = (0 == m_workMode) ? 125 : 125;
             break;
         case 2:
-            maxPressure = (0 == m_mode) ? 180 : 160;
+            maxPressure = (0 == m_workMode) ? 130 : 130;
             break;
         case 3:
-            maxPressure = (0 == m_mode) ? 200 : 170;
+            maxPressure = (0 == m_workMode) ? 135 : 135;
             break;
         case 4:
-            maxPressure = (0 == m_mode) ? 220 : 180;
-            break;
-    };
-#endif
-    switch(PowerLevel)
-    {
-        case 0:
-            maxPressure = (0 == m_mode) ? 120 : 120;
-            break;
-        case 1:
-            maxPressure = (0 == m_mode) ? 125 : 125;
-            break;
-        case 2:
-            maxPressure = (0 == m_mode) ? 130 : 130;
-            break;
-        case 3:
-            maxPressure = (0 == m_mode) ? 135 : 135;
-            break;
-        case 4:
-            maxPressure = (0 == m_mode) ? 140 : 140;
+            maxPressure = (0 == m_workMode) ? 140 : 140;
             break;
     };
 
@@ -206,7 +220,7 @@ void pumping_handler(void)
     {
         m_pumpState = 1;        // включение помпы
         m_minivalveState = 0;   // открытие минираспределение на накачку
-        m_reliefvalveState = 1; // закрытие клапана сброса
+        m_reliefValveState = 1; // закрытие клапана сброса
         m_pumping_cnt ++;
     }
     else
@@ -226,6 +240,37 @@ void pumping_handler(void)
 
 //------------------------------------------------------------------------------
 /**
+ * Обработчик импульсной накачки
+ */
+void pulsePumping_handler(void)
+{
+    ++m_pulse_mode_cnt;
+    m_pulse_mode_cnt = m_pulse_mode_cnt%5;
+    if (m_pulse_mode_cnt > 1)
+    { // 3
+        m_minivalveState = 0;   // открытие минираспределение на накачку
+    }
+    else
+    { // 2
+        m_minivalveState = 1;   // закрытие минираспределение на накачку
+    }
+    m_pumpState = 1;        // включение помпы
+    m_reliefValveState = 1; // закрытие клапана сброса
+}
+
+//------------------------------------------------------------------------------
+/**
+ * Рукоять режима сброса
+ */
+void releive_handler(void)
+{
+    m_pumpState = 0;        // выключение помпы
+    m_minivalveState = 1;   // открытие минираспределение на сброс
+    m_reliefValveState = 0; // открытие клапана сброса на сброс
+}
+
+//------------------------------------------------------------------------------
+/**
  * Обработчик рабочих режимов
  */
 void working_handler(void)
@@ -237,27 +282,16 @@ void working_handler(void)
         if(pressure < maxPressure)
         //if (m_pumping_cnt<10)
         {
-            if (0 == m_mode)
+            if (0 == m_workMode)
             {   // Обычный режим накачки
                 m_pumpState = 1;        // включение помпы
                 m_minivalveState = 0;   // открытие минираспределение на накачку
-                m_reliefvalveState = 1; // закрытие клапана сброса
+                m_reliefValveState = 1; // закрытие клапана сброса
             }
-            if (1 == m_mode)
+            if (1 == m_workMode)
             {   // Импульсный режим накачки
                 // накачка сменяется сбросом
-                ++m_pulse_mode_cnt;
-                m_pulse_mode_cnt = m_pulse_mode_cnt%5;
-                if (m_pulse_mode_cnt > 1)
-                { // 3
-                    m_minivalveState = 0;   // открытие минираспределение на накачку
-                }
-                else
-                { // 2
-                    m_minivalveState = 1;   // закрытие минираспределение на накачку
-                }
-                m_pumpState = 1;        // включение помпы
-                m_reliefvalveState = 1; // закрытие клапана сброса
+                pulsePumping_handler();
             }
             ++m_pumping_cnt;        // считает сколько циклов качал, чтобы столько же сбрасывать
         }
@@ -271,9 +305,7 @@ void working_handler(void)
     { // цикл сброса
         if (pressure > maxPressure)
         {
-            m_pumpState = 0;        // выключение помпы
-            m_minivalveState = 1;   // открытие минираспределение на сброс
-            m_reliefvalveState = 0; // открытие клапана сброса на сброс
+            releive_handler();
         }
         else
         {
@@ -283,10 +315,99 @@ void working_handler(void)
         }
     }
 
-    u32 second_limit = (0 == m_mode) ?  100 : 200;
-    if (m_cycles_cnt > SECOND_TO_CYKLE(second_limit)) 
+    u32 second_limit = (0 == m_workMode) ?  100 : 200;
+    if (m_cycles_cnt > SECOND_TO_CYKLE(second_limit))
     {
         m_current_mode = cm_error;
+        m_cycles_cnt = 0;
+    }
+}
+
+//------------------------------------------------------------------------------
+/**
+ * Возвращает время накачки
+ * @return
+ */
+u32 getMaxTimeVibroPumping(void)
+{
+    u32 maxTime = 0;
+    switch(PowerLevel)
+    {
+        case 0:
+            maxTime = 5;
+            break;
+        case 1:
+            maxTime = 7;
+            break;
+        case 2:
+            maxTime = 10;
+            break;
+        case 3:
+            maxTime = 13;
+            break;
+        case 4:
+            maxTime = 17;
+            break;
+    };
+
+    return maxTime;
+}
+
+//------------------------------------------------------------------------------
+/**
+ * Возвращает время накачки
+ * @return
+ */
+u32 getMaxTimeVibroRelief(void)
+{
+    u32 maxTime = 1;
+#if 1
+    switch(PowerLevel)
+    {
+        case 0:
+            maxTime = 3;
+            break;
+        case 1:
+            maxTime = 2;
+            break;
+        case 2:
+            maxTime = 2;
+            break;
+        case 3:
+            maxTime = 1;
+            break;
+        case 4:
+            maxTime = 1;
+            break;
+    };
+#endif
+    return maxTime;
+}
+
+//------------------------------------------------------------------------------
+/**
+ * Режим вибрации только по времени (без контроля давления)
+ */
+void vibroTime_handler(void)
+{
+    u32 second_limit = 0;
+
+    switch(m_vibroTimeStep)
+    {
+    case vibroTimeStep_vibroPumping:
+        second_limit = getMaxTimeVibroPumping();
+        pulsePumping_handler();
+        break;
+    case vibroTimeStep_relief:
+        second_limit = getMaxTimeVibroRelief();
+        releive_handler();
+        break;
+    }
+
+    if(m_cycles_cnt > SECOND_TO_CYKLE(second_limit))
+    {
+        ++m_vibroTimeStep;
+        m_vibroTimeStep = (vibroTimeStep_t)((u32)m_vibroTimeStep%(u32)vibroTimeStep_num);
         m_cycles_cnt = 0;
     }
 }
@@ -299,16 +420,31 @@ void modeSwitch(void)
 {
     switch (m_current_mode)
     {
-        case cm_readyuse:
-            break;
-        case cm_error:
-            break;
-        case cm_pumping:
+    case cm_readyuse:
+        break;
+    case cm_error:
+        break;
+    case cm_pumping:
+        switch (m_workMode)
+        {
+        case workMode_presso:
+        case workMode_vibro:
             pumping_handler();
             break;
-        case cm_working:
+        }
+        break;
+    case cm_working:
+        switch (m_workMode)
+        {
+        case workMode_vibroTime:
+            vibroTime_handler();
+            break;
+        case workMode_presso:
+        case workMode_vibro:
             working_handler();
             break;
+        };
+        break;
     };
 }
 
@@ -320,7 +456,7 @@ void solenoiduUnset(void)
 {
     m_pumpState = 0;            // выключение помпы
     m_minivalveState = 1;       // закрытие минираспределение на накачку, открытие на сброс
-    m_reliefvalveState = 0;     // открытие клапана сброса на сброс
+    m_reliefValveState = 0;     // открытие клапана сброса на сброс
 }
 
 //------------------------------------------------------------------------------
@@ -330,7 +466,7 @@ void solenoiduUnset(void)
 void solenoidControl(void)
 {
     setSolenoidState (m_minivalveState, MINIVALVE);
-    setSolenoidState (m_reliefvalveState, RELIEFVALVE);
+    setSolenoidState (m_reliefValveState, RELIEFVALVE);
     setSolenoidState (0, sol_chnl1);
     setSolenoidState (m_pumpState, PUMP);
 }
@@ -359,6 +495,10 @@ void blinkLed(u32 ledInd)
         state = !state;
 }
 
+//------------------------------------------------------------------------------
+/**
+ * Мигатель  светодиода D2
+ */
 void ledD2Control(void)
 {
     static u32 blink_cnt = 0;
@@ -403,7 +543,7 @@ void ledControl(void)
     if(isWorkingMode())
         setLedsPowerLavel(PowerLevel);
     else
-        blinkLed(m_mode); // мигание светодиода выбранного режима
+        blinkLed(m_workMode); // мигание светодиода выбранного режима
 
     ledD2Control();
 }
@@ -448,7 +588,6 @@ void mainLogicTask( void *pvParameters )
 
 void mainLogicHandler(void)
 {
-
     xTaskCreate( mainLogicTask, "buttons", configMINIMAL_STACK_SIZE, NULL, MAINLOGIC_PRIORITY, NULL );
 }
 
