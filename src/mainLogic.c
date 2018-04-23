@@ -59,7 +59,7 @@ volatile unsigned int PowerLevel = 0;   // уровень мощности
 current_mode_t m_current_mode = cm_readyuse;
 
 u32 m_pumpState = 0;
-u32 m_minivalveState = 0;
+u32 m_pumpValveState = 0;
 u32 m_reliefValveState = 0;
 workMode_t m_workMode = workMode_vibroTime;
 
@@ -219,7 +219,7 @@ void pumping_handler(void)
     if(pressure < maxPressure)
     {
         m_pumpState = 1;        // включение помпы
-        m_minivalveState = 0;   // открытие минираспределение на накачку
+        m_pumpValveState = 0;   // открытие минираспределение на накачку
         m_reliefValveState = 1; // закрытие клапана сброса
         m_pumping_cnt ++;
     }
@@ -248,14 +248,25 @@ void pulsePumping_handler(void)
     m_pulse_mode_cnt = m_pulse_mode_cnt%5;
     if (m_pulse_mode_cnt > 1)
     { // 3
-        m_minivalveState = 0;   // открытие минираспределение на накачку
+        m_pumpValveState = 0;   // открытие минираспределение на накачку
     }
     else
     { // 2
-        m_minivalveState = 1;   // закрытие минираспределение на накачку
+        m_pumpValveState = 1;   // закрытие минираспределение на накачку
     }
     m_pumpState = 1;        // включение помпы
     m_reliefValveState = 1; // закрытие клапана сброса
+}
+
+//------------------------------------------------------------------------------
+/**
+ * Выставление состояние соленоидов на безопасное в начале каждого цикла обработки
+ */
+void solenoiduUnset(void)
+{
+    m_pumpState = 0;        // выключение помпы
+    m_pumpValveState = 0;   // открытие клапана накачки
+    m_reliefValveState = 0; // открытие клапана сброса на сброс
 }
 
 //------------------------------------------------------------------------------
@@ -264,9 +275,7 @@ void pulsePumping_handler(void)
  */
 void releive_handler(void)
 {
-    m_pumpState = 0;        // выключение помпы
-    m_minivalveState = 1;   // открытие минираспределение на сброс
-    m_reliefValveState = 0; // открытие клапана сброса на сброс
+    solenoiduUnset();
 }
 
 //------------------------------------------------------------------------------
@@ -285,7 +294,7 @@ void working_handler(void)
             if (0 == m_workMode)
             {   // Обычный режим накачки
                 m_pumpState = 1;        // включение помпы
-                m_minivalveState = 0;   // открытие минираспределение на накачку
+                m_pumpValveState = 0;   // открытие минираспределение на накачку
                 m_reliefValveState = 1; // закрытие клапана сброса
             }
             if (1 == m_workMode)
@@ -450,22 +459,11 @@ void modeSwitch(void)
 
 //------------------------------------------------------------------------------
 /**
- * Выставление состояние соленоидов на безопасное в начале каждого цикла обработки
- */
-void solenoiduUnset(void)
-{
-    m_pumpState = 0;            // выключение помпы
-    m_minivalveState = 1;       // закрытие минираспределение на накачку, открытие на сброс
-    m_reliefValveState = 0;     // открытие клапана сброса на сброс
-}
-
-//------------------------------------------------------------------------------
-/**
  * Управление солиноидами
  */
 void solenoidControl(void)
 {
-    setSolenoidState (m_minivalveState, MINIVALVE);
+    setSolenoidState (m_pumpValveState, MINIVALVE);
     setSolenoidState (m_reliefValveState, RELIEFVALVE);
     setSolenoidState (0, sol_chnl1);
     setSolenoidState (m_pumpState, PUMP);
