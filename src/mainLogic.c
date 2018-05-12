@@ -54,9 +54,9 @@ typedef enum
 
 //------------------------------------------------------------------------------
 
-volatile unsigned int PowerLevel = 0;   // уровень мощности
+volatile unsigned int PowerLevel = 3;   // уровень мощности
 
-current_mode_t m_current_mode = cm_readyuse;
+current_mode_t m_current_mode = cm_working;
 
 u32 m_pumpState = 0;
 u32 m_pumpValveState = 0;

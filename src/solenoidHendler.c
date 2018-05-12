@@ -24,10 +24,10 @@
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin;
     GPIO_Init(GPIOx, &GPIO_InitStructure);
 }*/
-// помпа
+//
 #define PORT_CHANNEL1     GPIOB
 #define PIN_CHANNEL1      GPIO_Pin_15
-// клапан накачки
+//
 #define PORT_CHANNEL2     GPIOB
 #define PIN_CHANNEL2      GPIO_Pin_14
 //
@@ -106,7 +106,7 @@ void createSolenoid(GPIO_TypeDef* GPIOx, u16 GPIO_Pin, solenoide_t solenoide, bo
 void solenoidHandler(void)
 {
     createSolenoid(PORT_CHANNEL1, PIN_CHANNEL1, sol_chnl1, Bit_RESET);  // реле красный
-    createSolenoid(PORT_CHANNEL2, PIN_CHANNEL2, sol_chnl2, Bit_RESET);  // реле зеленый
+    createSolenoid(PORT_CHANNEL2, PIN_CHANNEL2, sol_chnl2, Bit_SET);  // реле зеленый
     createSolenoid(PORT_CHANNEL3, PIN_CHANNEL3, sol_chnl3, Bit_SET);    // помпа
     createSolenoid(PORT_CHANNEL4, PIN_CHANNEL4, sol_chnl4, Bit_SET);    // минираспределитель
 
