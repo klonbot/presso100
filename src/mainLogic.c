@@ -135,7 +135,7 @@ void setPneumoChannelPumpOn(pneumoCnl_t cnl)
 void setPneumoChannelPumpOut(pneumoCnl_t cnl)
 {
     setPneumoChannelState(cnl, pumpState_Off,
-        pumpValveState_Open, reliefValveState_Open); // спускается
+        pumpValveState_Close, reliefValveState_Open); // спускается
 }
 
 //------------------------------------------------------------------------------
@@ -146,7 +146,7 @@ void setPneumoChannelPumpOut(pneumoCnl_t cnl)
 void setPneumoChannelHold(pneumoCnl_t cnl)
 {
     setPneumoChannelState(cnl, pumpState_Off,
-        pumpValveState_Close, reliefValveState_Close); // удерживается
+        pumpValveState_Open, reliefValveState_Close); // удерживается
 }
 
 //------------------------------------------------------------------------------
