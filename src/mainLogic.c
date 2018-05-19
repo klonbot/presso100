@@ -58,10 +58,6 @@ volatile unsigned int PowerLevel = 3;   // уровень мощности
 
 current_mode_t m_current_mode = cm_working;
 
-//u32 m_pumpState = 0;
-//u32 m_pumpValveState = 0;
-//u32 m_reliefValveState = 0;
-
 typedef enum {pneumoCnl_1, pneumoCnl_2, pneumoCnl_3, pneumoCnl_4, pneumoCnl_num} pneumoCnl_t;
 u32 m_pumpLine[pneumoCnl_num];
 u32 m_pumpValveLine[pneumoCnl_num];
@@ -111,6 +107,22 @@ void setPumpValveState(pneumoCnl_t cnl, pumpValveState_t pumpValveState)
 void setReliefValveState(pneumoCnl_t cnl, reliefValveState_t reliefValveState)
 {
     m_reliefValveLine[cnl] = (u32)reliefValveState;
+}
+
+//------------------------------------------------------------------------------
+/**
+ * Установка состояния сразу всего пневматического канала
+ * @param cnl
+ * @param pumpState
+ * @param pumpValveState
+ * @param reliefValveState
+ */
+void setPneumoChannelState(pneumoCnl_t cnl, pumpState_t pumpState,
+    pumpValveState_t pumpValveState, reliefValveState_t reliefValveState)
+{
+    setPumpState(cnl, pumpState);
+    setPumpValveState(cnl, pumpValveState);
+    setReliefValveState(cnl, reliefValveState);
 }
 
 //------------------------------------------------------------------------------
@@ -266,22 +278,14 @@ void pumping_handler(void)
         // включение помпы
         // открытие минираспределение на накачку
         // закрытие клапана сброса
-
-        setPumpState(pneumoCnl_1, pumpState_On);
-        setPumpValveState(pneumoCnl_1, pumpValveState_Open);
-        setReliefValveState(pneumoCnl_1, reliefValveState_Close);
-
-        setPumpState(pneumoCnl_2, pumpState_On);
-        setPumpValveState(pneumoCnl_2, pumpValveState_Open);
-        setReliefValveState(pneumoCnl_2, reliefValveState_Close);
-
-        setPumpState(pneumoCnl_3, pumpState_On);
-        setPumpValveState(pneumoCnl_3, pumpValveState_Open);
-        setReliefValveState(pneumoCnl_3, reliefValveState_Close);
-
-        setPumpState(pneumoCnl_4, pumpState_On);
-        setPumpValveState(pneumoCnl_4, pumpValveState_Open);
-        setReliefValveState(pneumoCnl_4, reliefValveState_Close);
+        setPneumoChannelState(pneumoCnl_1, pumpState_On,
+            pumpValveState_Open, reliefValveState_Close);
+        setPneumoChannelState(pneumoCnl_2, pumpState_On,
+            pumpValveState_Open, reliefValveState_Close);
+        setPneumoChannelState(pneumoCnl_3, pumpState_On,
+            pumpValveState_Open, reliefValveState_Close);
+        setPneumoChannelState(pneumoCnl_4, pumpState_On,
+            pumpValveState_Open, reliefValveState_Close);
 
         m_pumping_cnt ++;
     }
@@ -311,31 +315,24 @@ void pulsePumping_handler(void)
     pumpValveState_t  pumpValveState = pumpValveState_Close;
     if (m_pulse_mode_cnt > 1)
     { // 3
-        //m_pumpValveState = 0;   // открытие минираспределение на накачку
+        // открытие минираспределение на накачку
         pumpValveState = pumpValveState_Open;
     }
     else
     { // 2
-        //m_pumpValveState = 1;   // закрытие минираспределение на накачку
+        // закрытие минираспределение на накачку
         pumpValveState = pumpValveState_Close;
     }
-    //m_pumpState = 1;        // включение помпы
-    //m_reliefValveState = 1; // закрытие клапана сброса
-    setPumpState(pneumoCnl_1, pumpState_On);
-    setPumpValveState(pneumoCnl_1, pumpValveState);
-    setReliefValveState(pneumoCnl_1, reliefValveState_Close);
-
-    setPumpState(pneumoCnl_2, pumpState_On);
-    setPumpValveState(pneumoCnl_2, pumpValveState);
-    setReliefValveState(pneumoCnl_2, reliefValveState_Close);
-
-    setPumpState(pneumoCnl_3, pumpState_On);
-    setPumpValveState(pneumoCnl_3, pumpValveState);
-    setReliefValveState(pneumoCnl_3, reliefValveState_Close);
-
-    setPumpState(pneumoCnl_4, pumpState_On);
-    setPumpValveState(pneumoCnl_4, pumpValveState);
-    setReliefValveState(pneumoCnl_4, reliefValveState_Close);
+    // включение помпы
+    // закрытие клапана сброса
+    setPneumoChannelState(pneumoCnl_1, pumpState_On,
+        pumpValveState, reliefValveState_Close);
+    setPneumoChannelState(pneumoCnl_2, pumpState_On,
+        pumpValveState, reliefValveState_Close);
+    setPneumoChannelState(pneumoCnl_3, pumpState_On,
+        pumpValveState, reliefValveState_Close);
+    setPneumoChannelState(pneumoCnl_4, pumpState_On,
+        pumpValveState, reliefValveState_Close);
 }
 
 //------------------------------------------------------------------------------
@@ -344,25 +341,18 @@ void pulsePumping_handler(void)
  */
 void solenoiduUnset(void)
 {
-    //m_pumpState = 0;        // выключение помпы
-    //m_pumpValveState = 0;   // открытие клапана накачки
-    //m_reliefValveState = 0; // открытие клапана сброса на сброс
+    // выключение помпы
+    // открытие клапана накачки
+    // открытие клапана сброса на сброс
 
-    setPumpState(pneumoCnl_1, pumpState_Off);
-    setPumpValveState(pneumoCnl_1, pumpValveState_Open);
-    setReliefValveState(pneumoCnl_1, reliefValveState_Open);
-
-    setPumpState(pneumoCnl_2, pumpState_Off);
-    setPumpValveState(pneumoCnl_2, pumpValveState_Open);
-    setReliefValveState(pneumoCnl_2, reliefValveState_Open);
-
-    setPumpState(pneumoCnl_3, pumpState_Off);
-    setPumpValveState(pneumoCnl_3, pumpValveState_Open);
-    setReliefValveState(pneumoCnl_3, reliefValveState_Open);
-
-    setPumpState(pneumoCnl_4, pumpState_Off);
-    setPumpValveState(pneumoCnl_4, pumpValveState_Open);
-    setReliefValveState(pneumoCnl_4, reliefValveState_Open);
+    setPneumoChannelState(pneumoCnl_1, pumpState_Off,
+        pumpValveState_Open, reliefValveState_Open);
+    setPneumoChannelState(pneumoCnl_2, pumpState_Off,
+        pumpValveState_Open, reliefValveState_Open);
+    setPneumoChannelState(pneumoCnl_3, pumpState_Off,
+        pumpValveState_Open, reliefValveState_Open);
+    setPneumoChannelState(pneumoCnl_4, pumpState_Off,
+        pumpValveState_Open, reliefValveState_Open);
 }
 
 //------------------------------------------------------------------------------
@@ -389,25 +379,18 @@ void working_handler(void)
         {
             if (0 == m_workMode)
             {   // Обычный режим накачки
-                //m_pumpState = 1;        // включение помпы
-                //m_pumpValveState = 0;   // открытие минираспределение на накачку
-                //m_reliefValveState = 1; // закрытие клапана сброса
+                // включение помпы
+                // открытие минираспределение на накачку
+                // закрытие клапана сброса
 
-                setPumpState(pneumoCnl_1, pumpState_On);
-                setPumpValveState(pneumoCnl_1, pumpValveState_Open);
-                setReliefValveState(pneumoCnl_1, reliefValveState_Close);
-
-                setPumpState(pneumoCnl_2, pumpState_On);
-                setPumpValveState(pneumoCnl_2, pumpValveState_Open);
-                setReliefValveState(pneumoCnl_2, reliefValveState_Close);
-
-                setPumpState(pneumoCnl_3, pumpState_On);
-                setPumpValveState(pneumoCnl_3, pumpValveState_Open);
-                setReliefValveState(pneumoCnl_3, reliefValveState_Close);
-
-                setPumpState(pneumoCnl_4, pumpState_On);
-                setPumpValveState(pneumoCnl_4, pumpValveState_Open);
-                setReliefValveState(pneumoCnl_4, reliefValveState_Close);
+                setPneumoChannelState(pneumoCnl_1, pumpState_On,
+                    pumpValveState_Open, reliefValveState_Close);
+                setPneumoChannelState(pneumoCnl_2, pumpState_On,
+                    pumpValveState_Open, reliefValveState_Close);
+                setPneumoChannelState(pneumoCnl_3, pumpState_On,
+                    pumpValveState_Open, reliefValveState_Close);
+                setPneumoChannelState(pneumoCnl_4, pumpState_On,
+                    pumpValveState_Open, reliefValveState_Close);
             }
             if (1 == m_workMode)
             {   // Импульсный режим накачки
