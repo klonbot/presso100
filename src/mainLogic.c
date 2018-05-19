@@ -16,14 +16,10 @@
 #include "task.h"
 #include "queue.h"
 
-/* Library includes. */
-#include "stm32f10x_gpio.h"
+#include "workModeRotator.h"
 
 //------------------------------------------------------------------------------
 
-#define TIME_OF_CYKLE 2 // время цикла
-#define SECOND_COEFF (1000/TIME_OF_CYKLE)
-#define SECOND_TO_CYKLE(x) (x*SECOND_COEFF)
 
 //------------------------------------------------------------------------------
 
@@ -40,6 +36,7 @@ typedef enum
     workMode_presso = 0,
     workMode_vibro = 1,
     workMode_vibroTime = 2,
+    workMode_rotator = 3,
 
     workMode_num
 } workMode_t;
@@ -58,23 +55,17 @@ volatile unsigned int PowerLevel = 3;   // уровень мощности
 
 current_mode_t m_current_mode = cm_working;
 
-typedef enum {pneumoCnl_1, pneumoCnl_2, pneumoCnl_3, pneumoCnl_4, pneumoCnl_num} pneumoCnl_t;
 u32 m_pumpLine[pneumoCnl_num];
 u32 m_pumpValveLine[pneumoCnl_num];
 u32 m_reliefValveLine[pneumoCnl_num];
 
-workMode_t m_workMode = workMode_vibroTime;
-
-u32 m_cycles_cnt = 0;
+workMode_t m_workMode = workMode_rotator;
+static u32 m_cycles_cnt = 0;
 u32 m_pumping_cnt = 0;          // счетчик накачки
 u32 m_work_cycle = 0;           // цикл работы
 u32 m_pulse_mode_cnt = 0;       // счетчик импульсного режима
 
 vibroTimeStep_t m_vibroTimeStep = vibroTimeStep_relief;
-
-typedef enum {pumpState_Off, pumpState_On} pumpState_t;
-typedef enum {pumpValveState_Open, pumpValveState_Close} pumpValveState_t;
-typedef enum {reliefValveState_Open, reliefValveState_Close} reliefValveState_t;
 
 //------------------------------------------------------------------------------
 /**
@@ -123,6 +114,39 @@ void setPneumoChannelState(pneumoCnl_t cnl, pumpState_t pumpState,
     setPumpState(cnl, pumpState);
     setPumpValveState(cnl, pumpValveState);
     setReliefValveState(cnl, reliefValveState);
+}
+
+//------------------------------------------------------------------------------
+/**
+ * Простая накачка
+ * @param cnl
+ */
+void setPneumoChannelPumpOn(pneumoCnl_t cnl)
+{
+    setPneumoChannelState(cnl, pumpState_On,
+        pumpValveState_Open, reliefValveState_Close); // надувается
+}
+
+//------------------------------------------------------------------------------
+/**
+ * Простой сдув
+ * @param cnl
+ */
+void setPneumoChannelPumpOut(pneumoCnl_t cnl)
+{
+    setPneumoChannelState(cnl, pumpState_Off,
+        pumpValveState_Open, reliefValveState_Open); // спускается
+}
+
+//------------------------------------------------------------------------------
+/**
+ * Удержание давления
+ * @param cnl
+ */
+void setPneumoChannelHold(pneumoCnl_t cnl)
+{
+    setPneumoChannelState(cnl, pumpState_Off,
+        pumpValveState_Close, reliefValveState_Close); // удерживается
 }
 
 //------------------------------------------------------------------------------
@@ -510,7 +534,7 @@ void vibroTime_handler(void)
 
     if(m_cycles_cnt > SECOND_TO_CYKLE(second_limit))
     {
-        ++m_vibroTimeStep;
+        m_vibroTimeStep = (vibroTimeStep_t)((u32)m_vibroTimeStep + 1);
         m_vibroTimeStep = (vibroTimeStep_t)((u32)m_vibroTimeStep%(u32)vibroTimeStep_num);
         m_cycles_cnt = 0;
     }
@@ -540,6 +564,9 @@ void modeSwitch(void)
     case cm_working:
         switch (m_workMode)
         {
+         case workMode_rotator:
+            workModeRotatorHandler();
+            break;
         case workMode_vibroTime:
             vibroTime_handler();
             break;
