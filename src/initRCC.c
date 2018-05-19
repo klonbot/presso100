@@ -1,34 +1,22 @@
-// main.c
+/*
+ * File:   initRCC.c
+ * Author: Дмитрий
+ *
+ * Created on 19 Май 2018 г., 17:24
+ */
+//------------------------------------------------------------------------------
 
-/* Standard includes. */
-#include <stdio.h>
+#include "initRCC.h"
 
-/* Scheduler includes. */
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
+//------------------------------------------------------------------------------
 
 /* Library includes. */
 #include "stm32f10x_it.h"
 #include "stm32f10x_gpio.h"
 #include "stm32f10x_adc.h"
 #include "stm32f10x_map.h"
-
-#include "types.h"
-#include "buttonHandler.h"
-#include "ledHandler.h"
-#include "terminal.h"
-#include "mainLogic.h"
-#include "pressure.h"
-#include "solenoidHendler.h"
-
-
 #include "stm32f10x_rcc.h"
 #include "stm32f10x_map.h"
-
-#include "report.h"
-
-//------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 
@@ -81,42 +69,4 @@ void initRCC (void)
     RCC_APB2PeriphResetCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC, DISABLE);
 }
 
-static void prvSetupHardware( void )
-{
-    initRCC();
-}
-
 //------------------------------------------------------------------------------
-int main( void )
-{
-#ifdef DEBUG
-    debug();
-#endif
-
-    prvSetupHardware();
-
-    //buttonHandler();    // Обработчик кнопок
-    ledHandler();       // Обработчик светодиодов
-    //terminalHandler();  // Обработчик терминалки
-    mainLogicHandler(); // Главный обработчик логики
-    //pressureHandler();  // Обработчик давления
-    solenoidHandler();  // Обработчик соленоидов
-
-    // Start the scheduler.
-    vTaskStartScheduler();
-
-    // Will only get here if there was not enough heap space to create the
-    // idle task.
-    return 0;
-}
-
-//------------------------------------------------------------------------------
-#ifdef  DEBUG
-/* Keep the linker happy. */
-void assert_failed( unsigned char* pcFile, unsigned long ulLine )
-{
-	for( ;; )
-	{
-	}
-}
-#endif

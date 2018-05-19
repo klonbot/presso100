@@ -1049,10 +1049,16 @@
     </file>
   </group>
   <file>
+    <name>$PROJ_DIR$\assert.c</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\buttonHandler.c</name>
   </file>
   <file>
     <name>$PROJ_DIR$\buttonHandler.h</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\initRCC.c</name>
   </file>
   <file>
     <name>$PROJ_DIR$\ledHandler.c</name>
@@ -1061,10 +1067,10 @@
     <name>$PROJ_DIR$\ledHandler.h</name>
   </file>
   <file>
-    <name>$PROJ_DIR$\main.c</name>
+    <name>$PROJ_DIR$\main.cpp</name>
   </file>
   <file>
-    <name>$PROJ_DIR$\mainLogic.c</name>
+    <name>$PROJ_DIR$\mainLogic.cpp</name>
   </file>
   <file>
     <name>$PROJ_DIR$\mainLogic.h</name>
@@ -1098,6 +1104,9 @@
   </file>
   <file>
     <name>$PROJ_DIR$\terminal.h</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\workModeRotator.cpp</name>
   </file>
 </project>
 
