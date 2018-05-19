@@ -58,9 +58,15 @@ volatile unsigned int PowerLevel = 3;   // уровень мощности
 
 current_mode_t m_current_mode = cm_working;
 
-u32 m_pumpState = 0;
-u32 m_pumpValveState = 0;
-u32 m_reliefValveState = 0;
+//u32 m_pumpState = 0;
+//u32 m_pumpValveState = 0;
+//u32 m_reliefValveState = 0;
+
+typedef enum {pneumoCnl_1, pneumoCnl_2, pneumoCnl_3, pneumoCnl_4, pneumoCnl_num} pneumoCnl_t;
+u32 m_pumpLine[pneumoCnl_num];
+u32 m_pumpValveLine[pneumoCnl_num];
+u32 m_reliefValveLine[pneumoCnl_num];
+
 workMode_t m_workMode = workMode_vibroTime;
 
 u32 m_cycles_cnt = 0;
@@ -70,6 +76,43 @@ u32 m_pulse_mode_cnt = 0;       // счетчик импульсного реж�
 
 vibroTimeStep_t m_vibroTimeStep = vibroTimeStep_relief;
 
+typedef enum {pumpState_Off, pumpState_On} pumpState_t;
+typedef enum {pumpValveState_Open, pumpValveState_Close} pumpValveState_t;
+typedef enum {reliefValveState_Open, reliefValveState_Close} reliefValveState_t;
+
+//------------------------------------------------------------------------------
+/**
+ * Управление состоянием помпы
+ * @param cnl
+ * @param pumpState
+ */
+void setPumpState(pneumoCnl_t cnl, pumpState_t pumpState)
+{
+    m_pumpLine[cnl] = (u32)pumpState;
+}
+
+//------------------------------------------------------------------------------
+/**
+ * Управление состоянием клапаном накачки
+ * @param cnl
+ * @param pumpState
+ */
+void setPumpValveState(pneumoCnl_t cnl, pumpValveState_t pumpValveState)
+{
+    m_pumpValveLine[cnl] = (u32)pumpValveState;
+}
+
+//------------------------------------------------------------------------------
+/**
+ * Управление состоянием клапаном сброса
+ * @param cnl
+ * @param reliefValveState
+ */
+void setReliefValveState(pneumoCnl_t cnl, reliefValveState_t reliefValveState)
+{
+    m_reliefValveLine[cnl] = (u32)reliefValveState;
+}
+
 //------------------------------------------------------------------------------
 /**
  * Вывод уровня мощности
@@ -77,11 +120,13 @@ vibroTimeStep_t m_vibroTimeStep = vibroTimeStep_relief;
  */
 void setLedsPowerLavel(u32 PowerLavel)
 {
+/*
     setLedState((1), led_level1);
     setLedState((PowerLavel > 0), led_level2);
     setLedState((PowerLavel > 1), led_level3);
     setLedState((PowerLavel > 2), led_level4);
     setLedState((PowerLavel > 3), led_level5);
+*/
 }
 
 //------------------------------------------------------------------------------
@@ -218,9 +263,26 @@ void pumping_handler(void)
     u32 maxPressure = getMaxPressure();
     if(pressure < maxPressure)
     {
-        m_pumpState = 1;        // включение помпы
-        m_pumpValveState = 0;   // открытие минираспределение на накачку
-        m_reliefValveState = 1; // закрытие клапана сброса
+        // включение помпы
+        // открытие минираспределение на накачку
+        // закрытие клапана сброса
+
+        setPumpState(pneumoCnl_1, pumpState_On);
+        setPumpValveState(pneumoCnl_1, pumpValveState_Open);
+        setReliefValveState(pneumoCnl_1, reliefValveState_Close);
+
+        setPumpState(pneumoCnl_2, pumpState_On);
+        setPumpValveState(pneumoCnl_2, pumpValveState_Open);
+        setReliefValveState(pneumoCnl_2, reliefValveState_Close);
+
+        setPumpState(pneumoCnl_3, pumpState_On);
+        setPumpValveState(pneumoCnl_3, pumpValveState_Open);
+        setReliefValveState(pneumoCnl_3, reliefValveState_Close);
+
+        setPumpState(pneumoCnl_4, pumpState_On);
+        setPumpValveState(pneumoCnl_4, pumpValveState_Open);
+        setReliefValveState(pneumoCnl_4, reliefValveState_Close);
+
         m_pumping_cnt ++;
     }
     else
@@ -246,16 +308,34 @@ void pulsePumping_handler(void)
 {
     ++m_pulse_mode_cnt;
     m_pulse_mode_cnt = m_pulse_mode_cnt%5;
+    pumpValveState_t  pumpValveState = pumpValveState_Close;
     if (m_pulse_mode_cnt > 1)
     { // 3
-        m_pumpValveState = 0;   // открытие минираспределение на накачку
+        //m_pumpValveState = 0;   // открытие минираспределение на накачку
+        pumpValveState = pumpValveState_Open;
     }
     else
     { // 2
-        m_pumpValveState = 1;   // закрытие минираспределение на накачку
+        //m_pumpValveState = 1;   // закрытие минираспределение на накачку
+        pumpValveState = pumpValveState_Close;
     }
-    m_pumpState = 1;        // включение помпы
-    m_reliefValveState = 1; // закрытие клапана сброса
+    //m_pumpState = 1;        // включение помпы
+    //m_reliefValveState = 1; // закрытие клапана сброса
+    setPumpState(pneumoCnl_1, pumpState_On);
+    setPumpValveState(pneumoCnl_1, pumpValveState);
+    setReliefValveState(pneumoCnl_1, reliefValveState_Close);
+
+    setPumpState(pneumoCnl_2, pumpState_On);
+    setPumpValveState(pneumoCnl_2, pumpValveState);
+    setReliefValveState(pneumoCnl_2, reliefValveState_Close);
+
+    setPumpState(pneumoCnl_3, pumpState_On);
+    setPumpValveState(pneumoCnl_3, pumpValveState);
+    setReliefValveState(pneumoCnl_3, reliefValveState_Close);
+
+    setPumpState(pneumoCnl_4, pumpState_On);
+    setPumpValveState(pneumoCnl_4, pumpValveState);
+    setReliefValveState(pneumoCnl_4, reliefValveState_Close);
 }
 
 //------------------------------------------------------------------------------
@@ -264,9 +344,25 @@ void pulsePumping_handler(void)
  */
 void solenoiduUnset(void)
 {
-    m_pumpState = 0;        // выключение помпы
-    m_pumpValveState = 0;   // открытие клапана накачки
-    m_reliefValveState = 0; // открытие клапана сброса на сброс
+    //m_pumpState = 0;        // выключение помпы
+    //m_pumpValveState = 0;   // открытие клапана накачки
+    //m_reliefValveState = 0; // открытие клапана сброса на сброс
+
+    setPumpState(pneumoCnl_1, pumpState_Off);
+    setPumpValveState(pneumoCnl_1, pumpValveState_Open);
+    setReliefValveState(pneumoCnl_1, reliefValveState_Open);
+
+    setPumpState(pneumoCnl_2, pumpState_Off);
+    setPumpValveState(pneumoCnl_2, pumpValveState_Open);
+    setReliefValveState(pneumoCnl_2, reliefValveState_Open);
+
+    setPumpState(pneumoCnl_3, pumpState_Off);
+    setPumpValveState(pneumoCnl_3, pumpValveState_Open);
+    setReliefValveState(pneumoCnl_3, reliefValveState_Open);
+
+    setPumpState(pneumoCnl_4, pumpState_Off);
+    setPumpValveState(pneumoCnl_4, pumpValveState_Open);
+    setReliefValveState(pneumoCnl_4, reliefValveState_Open);
 }
 
 //------------------------------------------------------------------------------
@@ -293,9 +389,25 @@ void working_handler(void)
         {
             if (0 == m_workMode)
             {   // Обычный режим накачки
-                m_pumpState = 1;        // включение помпы
-                m_pumpValveState = 0;   // открытие минираспределение на накачку
-                m_reliefValveState = 1; // закрытие клапана сброса
+                //m_pumpState = 1;        // включение помпы
+                //m_pumpValveState = 0;   // открытие минираспределение на накачку
+                //m_reliefValveState = 1; // закрытие клапана сброса
+
+                setPumpState(pneumoCnl_1, pumpState_On);
+                setPumpValveState(pneumoCnl_1, pumpValveState_Open);
+                setReliefValveState(pneumoCnl_1, reliefValveState_Close);
+
+                setPumpState(pneumoCnl_2, pumpState_On);
+                setPumpValveState(pneumoCnl_2, pumpValveState_Open);
+                setReliefValveState(pneumoCnl_2, reliefValveState_Close);
+
+                setPumpState(pneumoCnl_3, pumpState_On);
+                setPumpValveState(pneumoCnl_3, pumpValveState_Open);
+                setReliefValveState(pneumoCnl_3, reliefValveState_Close);
+
+                setPumpState(pneumoCnl_4, pumpState_On);
+                setPumpValveState(pneumoCnl_4, pumpValveState_Open);
+                setReliefValveState(pneumoCnl_4, reliefValveState_Close);
             }
             if (1 == m_workMode)
             {   // Импульсный режим накачки
@@ -463,10 +575,21 @@ void modeSwitch(void)
  */
 void solenoidControl(void)
 {
-    setSolenoidState (m_pumpValveState, MINIVALVE);
-    setSolenoidState (m_reliefValveState, RELIEFVALVE);
-    setSolenoidState (0, sol_chnl1);
-    setSolenoidState (m_pumpState, PUMP);
+    setSolenoidState (m_pumpValveLine[pneumoCnl_1], MINIVALVE_1);
+    setSolenoidState (m_reliefValveLine[pneumoCnl_1], RELIEFVALVE_1);
+    setSolenoidState (m_pumpLine[pneumoCnl_1], PUMP_1);
+
+    setSolenoidState (m_pumpValveLine[pneumoCnl_2], MINIVALVE_2);
+    setSolenoidState (m_reliefValveLine[pneumoCnl_2], RELIEFVALVE_2);
+    setSolenoidState (m_pumpLine[pneumoCnl_2], PUMP_2);
+
+    setSolenoidState (m_pumpValveLine[pneumoCnl_3], MINIVALVE_3);
+    setSolenoidState (m_reliefValveLine[pneumoCnl_3], RELIEFVALVE_3);
+    setSolenoidState (m_pumpLine[pneumoCnl_3], PUMP_3);
+
+    setSolenoidState (m_pumpValveLine[pneumoCnl_4], MINIVALVE_4);
+    setSolenoidState (m_reliefValveLine[pneumoCnl_4], RELIEFVALVE_4);
+    setSolenoidState (m_pumpLine[pneumoCnl_4], PUMP_4);
 }
 
 //------------------------------------------------------------------------------
@@ -479,6 +602,7 @@ void blinkLed(u32 ledInd)
     static u32 blink_cnt = 0;
     static u32 state = 0;
 
+/*
     setLedState(0, led_level1);
     setLedState(0, led_level2);
     setLedState(0, led_level3);
@@ -486,6 +610,7 @@ void blinkLed(u32 ledInd)
     setLedState(0, led_level5);
 
     setLedState(state, (lede_t)((u32)led_level1 + ledInd));
+*/
 
     blink_cnt++;
     blink_cnt = blink_cnt%60;
@@ -535,8 +660,10 @@ void ledControl(void)
             led_start_state = 1;
             break;
     };
+/*
     setLedState (led_start_state, led_start);
     setLedState (led_warning_state, led_warning);
+*/
 
     if(isWorkingMode())
         setLedsPowerLavel(PowerLevel);
@@ -557,6 +684,7 @@ void mainLogicTask( void *pvParameters )
 
     vTaskDelay(1000);
 
+/*
     setLedState (0, led_level1);
     setLedState (0, led_level2);
     setLedState (0, led_level3);
@@ -564,6 +692,7 @@ void mainLogicTask( void *pvParameters )
     setLedState (0, led_level5);
     setLedState (0, led_warning);
     setLedState (0, led_start);
+*/
 
     setLedsPowerLavel(PowerLevel);
 

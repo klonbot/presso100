@@ -17,7 +17,7 @@
 #include "stm32f10x_gpio.h"
 
 //------------------------------------------------------------------------------
-
+#if 0
 #define PORT_LED_LEVEL1     GPIOA
 #define PIN_LED_LEVEL1      GPIO_Pin_2
 
@@ -38,6 +38,7 @@
 
 #define PORT_LED_START      GPIOB
 #define PIN_LED_START       GPIO_Pin_6
+#endif
 /*
 #define PORT_LED_1          GPIOA // Level 5
 #define PIN_LED_1           GPIO_Pin_4
@@ -53,7 +54,7 @@
 
 //------------------------------------------------------------------------------
 
-#define MAX_NUM_LEDS 15
+#define MAX_NUM_LEDS led_num
 
 //------------------------------------------------------------------------------
 
@@ -133,13 +134,13 @@ void createLed(GPIO_TypeDef* GPIOx, u16 GPIO_Pin, lede_t lede)
 void ledHandler(void)
 {
     // инициализация светодиодов
-    createLed(PORT_LED_LEVEL1, PIN_LED_LEVEL1, led_level1);
-    createLed(PORT_LED_LEVEL2, PIN_LED_LEVEL2, led_level2);
-    createLed(PORT_LED_LEVEL3, PIN_LED_LEVEL3, led_level3);
-    createLed(PORT_LED_LEVEL4, PIN_LED_LEVEL4, led_level4);
-    createLed(PORT_LED_LEVEL5, PIN_LED_LEVEL5, led_level5);
-    createLed(PORT_LED_WARNING, PIN_LED_WARNING, led_warning);
-    createLed(PORT_LED_START, PIN_LED_START, led_start);
+    //createLed(PORT_LED_LEVEL1, PIN_LED_LEVEL1, led_level1);
+    //createLed(PORT_LED_LEVEL2, PIN_LED_LEVEL2, led_level2);
+    //createLed(PORT_LED_LEVEL3, PIN_LED_LEVEL3, led_level3);
+    //createLed(PORT_LED_LEVEL4, PIN_LED_LEVEL4, led_level4);
+    //createLed(PORT_LED_LEVEL5, PIN_LED_LEVEL5, led_level5);
+    //createLed(PORT_LED_WARNING, PIN_LED_WARNING, led_warning);
+    //createLed(PORT_LED_START, PIN_LED_START, led_start);
 
     //createLed(PORT_LED_1, PIN_LED_1, led_1);
     //createLed(PORT_LED_2, PIN_LED_2, led_2);

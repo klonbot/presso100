@@ -21,10 +21,11 @@ extern "C" {
  */
 typedef enum
 {
-    led_level1, led_level2, led_level3,
+    /*led_level1, led_level2, led_level3,
     led_level4, led_level5, led_warning, led_start,
-    led_1, led_2, led_3,
-    led_D2
+    led_1, led_2, led_3,*/
+    led_D2,
+    led_num
 } lede_t;
 
 //------------------------------------------------------------------------------
