@@ -21,11 +21,30 @@ typedef enum
     phaseRotation_num
 } phaseRotation_t;
 
+typedef enum
+{
+    profile_lowRight,
+    profile_lowLeft,
+    profile_mediulRight,
+    profile_mediumLeft,
+    profile_hightRight,
+    profile_hightLeft,
+    profile_num
+} profile_t;
+
 //------------------------------------------------------------------------------
 
 enum {timePhase_s = 4};
 
 typedef enum {directionRotation_right, directionRotation_left} directionRotation_t;
+
+/**
+ * Структура программного профиля
+ */
+typedef struct
+{
+    channelState_t phaseChannelState[phaseRotation_num][pneumoCnl_num];
+} programmProfile_t;
 
 //------------------------------------------------------------------------------
 
@@ -33,6 +52,78 @@ phaseRotation_t m_phaseRotation = phaseRotation_1;
 static u32 m_cycles_cnt = 0;
 static u32 m_round_cnt = 0;
 static directionRotation_t m_directionRotation = directionRotation_right;
+static const programmProfile_t programmProfile[profile_num] =
+{
+    [profile_lowRight] =
+    {
+        .phaseChannelState =
+        {
+            [phaseRotation_1] =
+            {
+                [pneumoCnl_1] = channelState_PumpOn,
+                [pneumoCnl_2] = channelState_PumpOut,
+                [pneumoCnl_3] = channelState_PumpOut,
+                [pneumoCnl_4] = channelState_Hold
+            },
+            [phaseRotation_2] =
+            {
+                [pneumoCnl_1] = channelState_Hold,
+                [pneumoCnl_2] = channelState_PumpOn,
+                [pneumoCnl_3] = channelState_PumpOut,
+                [pneumoCnl_4] = channelState_PumpOut
+            },
+            [phaseRotation_3] =
+            {
+                [pneumoCnl_1] = channelState_PumpOut,
+                [pneumoCnl_2] = channelState_Hold,
+                [pneumoCnl_3] = channelState_PumpOn,
+                [pneumoCnl_4] = channelState_PumpOut
+            },
+            [phaseRotation_4] =
+            {
+                [pneumoCnl_1] = channelState_PumpOut,
+                [pneumoCnl_2] = channelState_PumpOut,
+                [pneumoCnl_3] = channelState_Hold,
+                [pneumoCnl_4] = channelState_PumpOn
+            }
+        }
+    },
+    [profile_lowLeft] =
+    {
+        .phaseChannelState =
+        {
+            [phaseRotation_1] =
+            {
+                [pneumoCnl_1] = channelState_PumpOn,
+                [pneumoCnl_2] = channelState_Hold,
+                [pneumoCnl_3] = channelState_PumpOut,
+                [pneumoCnl_4] = channelState_PumpOut
+            },
+            [phaseRotation_2] =
+            {
+                [pneumoCnl_1] = channelState_Hold,
+                [pneumoCnl_2] = channelState_PumpOut,
+                [pneumoCnl_3] = channelState_PumpOut,
+                [pneumoCnl_4] = channelState_PumpOn
+            },
+            [phaseRotation_3] =
+            {
+                [pneumoCnl_1] = channelState_PumpOut,
+                [pneumoCnl_2] = channelState_PumpOut,
+                [pneumoCnl_3] = channelState_PumpOn,
+                [pneumoCnl_4] = channelState_Hold
+            },
+            [phaseRotation_4] =
+            {
+                [pneumoCnl_1] = channelState_PumpOut,
+                [pneumoCnl_2] = channelState_PumpOn,
+                [pneumoCnl_3] = channelState_Hold,
+                [pneumoCnl_4] = channelState_PumpOut
+            }
+        }
+    }
+};
+
 
 //------------------------------------------------------------------------------
 /**
@@ -40,6 +131,7 @@ static directionRotation_t m_directionRotation = directionRotation_right;
  */
 void switchRotation(void)
 {
+
     if (directionRotation_right == m_directionRotation)
     {
         m_directionRotation = directionRotation_left;
@@ -99,65 +191,20 @@ void nextPhaseHandler(void)
  */
 void phaseSwitch(void)
 {
+    profile_t profile = profile_lowRight;
     if (directionRotation_right == m_directionRotation)
     {
-        switch(m_phaseRotation)
-        {
-            case phaseRotation_1:
-                setPneumoChannelPumpOn(pneumoCnl_1);    // надувается
-                setPneumoChannelHold(pneumoCnl_4);      // удерживается
-                setPneumoChannelPumpOut(pneumoCnl_3);   // спускается
-                setPneumoChannelPumpOut(pneumoCnl_2);   // спускается - уже спущено
-                break;
-            case phaseRotation_2:
-                setPneumoChannelPumpOn(pneumoCnl_2);    // надувается
-                setPneumoChannelHold(pneumoCnl_1);      // удерживается
-                setPneumoChannelPumpOut(pneumoCnl_4);   // спускается
-                setPneumoChannelPumpOut(pneumoCnl_3);   // спускается - уже спущено
-                break;
-            case phaseRotation_3:
-                setPneumoChannelPumpOn(pneumoCnl_3);    // надувается
-                setPneumoChannelHold(pneumoCnl_2);      // удерживается
-                setPneumoChannelPumpOut(pneumoCnl_1);   // спускается
-                setPneumoChannelPumpOut(pneumoCnl_4);   // спускается - уже спущено
-                break;
-            case phaseRotation_4:
-                setPneumoChannelPumpOn(pneumoCnl_4);    // надувается
-                setPneumoChannelHold(pneumoCnl_3);      // удерживается
-                setPneumoChannelPumpOut(pneumoCnl_2);   // спускается
-                setPneumoChannelPumpOut(pneumoCnl_1);   // спускается - уже спущено
-                break;
-        }
+        profile = profile_lowRight;
     }
     if (directionRotation_left == m_directionRotation)
     {
-        switch(m_phaseRotation)
-        {
-            case phaseRotation_1:
-                setPneumoChannelPumpOn(pneumoCnl_1);    // надувается
-                setPneumoChannelHold(pneumoCnl_2);      // удерживается
-                setPneumoChannelPumpOut(pneumoCnl_3);   // спускается
-                setPneumoChannelPumpOut(pneumoCnl_4);   // спускается - уже спущено
-                break;
-            case phaseRotation_2:
-                setPneumoChannelPumpOn(pneumoCnl_4);    // надувается
-                setPneumoChannelHold(pneumoCnl_1);      // удерживается
-                setPneumoChannelPumpOut(pneumoCnl_2);   // спускается
-                setPneumoChannelPumpOut(pneumoCnl_3);   // спускается - уже спущено
-                break;
-            case phaseRotation_3:
-                setPneumoChannelPumpOn(pneumoCnl_3);    // надувается
-                setPneumoChannelHold(pneumoCnl_4);      // удерживается
-                setPneumoChannelPumpOut(pneumoCnl_1);   // спускается
-                setPneumoChannelPumpOut(pneumoCnl_2);   // спускается - уже спущено
-                break;
-            case phaseRotation_4:
-                setPneumoChannelPumpOn(pneumoCnl_2);    // надувается
-                setPneumoChannelHold(pneumoCnl_3);      // удерживается
-                setPneumoChannelPumpOut(pneumoCnl_4);   // спускается
-                setPneumoChannelPumpOut(pneumoCnl_1);   // спускается - уже спущено
-                break;
-        }
+        profile = profile_lowLeft;
+    }
+    pneumoCnl_t pneumoCnl = pneumoCnl_1;
+    for (; pneumoCnl< pneumoCnl_num; pneumoCnl++)
+    {
+        setPneumoChannelStateTogether(pneumoCnl,
+            programmProfile[profile].phaseChannelState[m_phaseRotation][pneumoCnl]);
     }
 }
 

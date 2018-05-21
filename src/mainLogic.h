@@ -24,6 +24,7 @@ typedef enum {pneumoCnl_1, pneumoCnl_2, pneumoCnl_3, pneumoCnl_4, pneumoCnl_num}
 typedef enum {pumpState_Off, pumpState_On} pumpState_t;
 typedef enum {pumpValveState_Open, pumpValveState_Close} pumpValveState_t;
 typedef enum {reliefValveState_Open, reliefValveState_Close} reliefValveState_t;
+typedef enum {channelState_PumpOut, channelState_PumpOn, channelState_Hold} channelState_t;
 
 //------------------------------------------------------------------------------
 
@@ -39,10 +40,11 @@ void setPneumoChannelState(pneumoCnl_t cnl, pumpState_t pumpState,
 void setPneumoChannelPumpOn(pneumoCnl_t cnl);
 void setPneumoChannelPumpOut(pneumoCnl_t cnl);
 void setPneumoChannelHold(pneumoCnl_t cnl);
+void setPneumoChannelStateTogether(pneumoCnl_t cnl, channelState_t state);
 
 #ifdef  __cplusplus
 }
-#endif 
+#endif
 //------------------------------------------------------------------------------
 
 #endif  /* MAINLOGIC_H */

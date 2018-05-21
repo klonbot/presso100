@@ -151,6 +151,28 @@ void setPneumoChannelHold(pneumoCnl_t cnl)
 
 //------------------------------------------------------------------------------
 /**
+ * Установка Режима работы канала
+ * @param cnl
+ * @param state
+ */
+void setPneumoChannelStateTogether(pneumoCnl_t cnl, channelState_t state)
+{
+    switch (state)
+    {
+    case channelState_PumpOut:
+        setPneumoChannelPumpOut(cnl);
+        break;
+    case channelState_PumpOn:
+        setPneumoChannelPumpOn(cnl);
+        break;
+    case channelState_Hold:
+        setPneumoChannelHold(cnl);
+        break;
+    }
+}
+
+//------------------------------------------------------------------------------
+/**
  * Вывод уровня мощности
  * @param PowerLavel - уровень мощности
  */
