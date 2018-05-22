@@ -25,7 +25,7 @@ typedef enum
 {
     profile_lowRight,
     profile_lowLeft,
-    profile_mediulRight,
+    profile_mediumRight,
     profile_mediumLeft,
     profile_hightRight,
     profile_hightLeft,
@@ -34,7 +34,7 @@ typedef enum
 
 //------------------------------------------------------------------------------
 
-enum {timePhase_s = 4};
+enum {timePhase_s = 6};
 
 typedef enum {directionRotation_right, directionRotation_left} directionRotation_t;
 
@@ -121,6 +121,40 @@ static const programmProfile_t programmProfile[profile_num] =
                 [pneumoCnl_4] = channelState_PumpOut
             }
         }
+    },
+    [profile_mediumRight] =
+    {
+        .phaseChannelState =
+        {
+            [phaseRotation_1] =
+            {
+                [pneumoCnl_1] = channelState_PumpOn,
+                [pneumoCnl_2] = channelState_PumpOn,
+                [pneumoCnl_3] = channelState_PumpOut,
+                [pneumoCnl_4] = channelState_Hold
+            },
+            [phaseRotation_2] =
+            {
+                [pneumoCnl_1] = channelState_Hold,
+                [pneumoCnl_2] = channelState_PumpOn,
+                [pneumoCnl_3] = channelState_PumpOn,
+                [pneumoCnl_4] = channelState_PumpOut
+            },
+            [phaseRotation_3] =
+            {
+                [pneumoCnl_1] = channelState_PumpOut,
+                [pneumoCnl_2] = channelState_Hold,
+                [pneumoCnl_3] = channelState_PumpOn,
+                [pneumoCnl_4] = channelState_PumpOn
+            },
+            [phaseRotation_4] =
+            {
+                [pneumoCnl_1] = channelState_PumpOn,
+                [pneumoCnl_2] = channelState_PumpOut,
+                [pneumoCnl_3] = channelState_Hold,
+                [pneumoCnl_4] = channelState_PumpOn
+            }
+        }
     }
 };
 
@@ -194,11 +228,11 @@ void phaseSwitch(void)
     profile_t profile = profile_lowRight;
     if (directionRotation_right == m_directionRotation)
     {
-        profile = profile_lowRight;
+        profile = profile_mediumRight;
     }
     if (directionRotation_left == m_directionRotation)
     {
-        profile = profile_lowLeft;
+        profile = profile_mediumRight;
     }
     pneumoCnl_t pneumoCnl = pneumoCnl_1;
     for (; pneumoCnl< pneumoCnl_num; pneumoCnl++)
