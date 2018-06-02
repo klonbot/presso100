@@ -151,6 +151,32 @@ void setPneumoChannelHold(pneumoCnl_t cnl)
 
 //------------------------------------------------------------------------------
 /**
+ * Вибрационное наполнение
+ * @param cnl
+ */
+void setPneumoChannelVibro(pneumoCnl_t cnl)
+{
+    ++m_pulse_mode_cnt;
+    m_pulse_mode_cnt = m_pulse_mode_cnt%5;
+    pumpValveState_t  pumpValveState = pumpValveState_Close;
+    if (m_pulse_mode_cnt > 1)
+    { // 3
+        // открытие минираспределение на накачку
+        pumpValveState = pumpValveState_Open;
+    }
+    else
+    { // 2
+        // закрытие минираспределение на накачку
+        pumpValveState = pumpValveState_Close;
+    }
+    // включение помпы
+    // закрытие клапана сброса
+    setPneumoChannelState(cnl, pumpState_On,
+        pumpValveState, reliefValveState_Close);
+}
+
+//------------------------------------------------------------------------------
+/**
  * Установка Режима работы канала
  * @param cnl
  * @param state
@@ -167,6 +193,9 @@ void setPneumoChannelStateTogether(pneumoCnl_t cnl, channelState_t state)
         break;
     case channelState_Hold:
         setPneumoChannelHold(cnl);
+        break;
+    case channelState_Vibro:
+        setPneumoChannelVibro(cnl);
         break;
     }
 }
