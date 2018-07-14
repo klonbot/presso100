@@ -28,7 +28,12 @@
 xComPortHandle m_serial;
 signed char text_start[] = "start!\n\r";
 
-void terminalTask( void *pvParameters )
+//------------------------------------------------------------------------------
+/**
+ * Задача отправки данных
+ * @param pvParameters
+ */
+void terminalTxTask( void *pvParameters )
 {
     NO_USE_PARAM(pvParameters);
 
@@ -37,7 +42,6 @@ void terminalTask( void *pvParameters )
 
     while(1)
     {
-/*
         if (!cnt)
             vTaskDelay(1000);
 
@@ -48,10 +52,32 @@ void terminalTask( void *pvParameters )
 
         cnt++;
         cnt = cnt%9;
-*/
 
         vTaskDelay(100);
     }
+}
+
+signed char text_rx[] = "Rx\n\r";
+//------------------------------------------------------------------------------
+/**
+ * Задача приема данных
+ * @param pvParameters
+ */
+void terminalRxTask( void *pvParameters )
+{
+    NO_USE_PARAM(pvParameters);
+
+    while(1)
+    {
+        //vSerialPutString(m_serial, text_rx, 4 );
+        signed char RxedChar;
+        if (xSerialGetChar(m_serial, &RxedChar, 100))
+        {
+            xSerialPutChar( m_serial, RxedChar, 100);
+        }
+		vTaskDelay(1);
+    }
+
 }
 
 //Структуры для инициализации GPIOA и USART1
@@ -61,7 +87,7 @@ NVIC_InitTypeDef NVIC_InitStructure;
 
 void serialInit(void)
 {
-    m_serial = xSerialPortInitMinimal( 921600, 1000 );
+    m_serial = xSerialPortInitMinimal( 9600, 1000 );
 }
 
 void terminalHandler(void)
@@ -69,7 +95,8 @@ void terminalHandler(void)
     // Инициализация соединения
     serialInit();
 
-    //xTaskCreate( terminalTask, "terminal", configMINIMAL_STACK_SIZE, NULL, TERMINAL_PRIORITY, NULL );
+    //xTaskCreate( terminalTxTask, "terminalTx", configMINIMAL_STACK_SIZE, NULL, TERMINAL_PRIORITY, NULL );
+    xTaskCreate( terminalRxTask, "terminalRx", configMINIMAL_STACK_SIZE, NULL, TERMINAL_PRIORITY, NULL );
 }
 
 
