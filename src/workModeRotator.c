@@ -18,26 +18,33 @@ typedef enum
     phaseRotation_2,
     phaseRotation_3,
     phaseRotation_4,
+
+    phaseRotation_5,
+    phaseRotation_6,
+
+    phaseRotation_7,
+    phaseRotation_8,
+    phaseRotation_9,
+    phaseRotation_10,
+
+    phaseRotation_11,
+    phaseRotation_12,
+
     phaseRotation_num
 } phaseRotation_t;
 
 typedef enum
 {
-    profile_lowRight,
-    profile_lowLeft,
-    profile_mediumRight,
-    profile_mediumLeft,
-    profile_hightRight,
-    profile_hightLeft,
+    profile_roundPillow,
+
     profile_num
 } profile_t;
 
 //------------------------------------------------------------------------------
 
-enum {timePhase_s = 6};
+enum {timePhase_s = 1};
 
-typedef enum {directionRotation_right, directionRotation_left} directionRotation_t;
-
+//------------------------------------------------------------------------------
 /**
  * Структура программного профиля
  */
@@ -51,145 +58,112 @@ typedef struct
 phaseRotation_t m_phaseRotation = phaseRotation_1;
 static u32 m_cycles_cnt = 0;
 static u32 m_round_cnt = 0;
-static directionRotation_t m_directionRotation = directionRotation_right;
 static const programmProfile_t programmProfile[profile_num] =
 {
-    [profile_lowRight] =
+    [profile_roundPillow] =
     {
         .phaseChannelState =
         {
             [phaseRotation_1] =
             {
                 [pneumoCnl_1] = channelState_PumpOn,
-                [pneumoCnl_2] = channelState_PumpOut,
-                [pneumoCnl_3] = channelState_PumpOut,
-                [pneumoCnl_4] = channelState_Hold
-            },
-            [phaseRotation_2] =
-            {
-                [pneumoCnl_1] = channelState_Hold,
+
                 [pneumoCnl_2] = channelState_PumpOn,
-                [pneumoCnl_3] = channelState_PumpOut,
-                [pneumoCnl_4] = channelState_PumpOut
-            },
-            [phaseRotation_3] =
-            {
-                [pneumoCnl_1] = channelState_PumpOut,
-                [pneumoCnl_2] = channelState_Hold,
                 [pneumoCnl_3] = channelState_PumpOn,
                 [pneumoCnl_4] = channelState_PumpOut
             },
+            [phaseRotation_2] =
+            {
+                [pneumoCnl_1] = channelState_Vibro,
+
+                [pneumoCnl_2] = channelState_PumpOut,
+                [pneumoCnl_3] = channelState_PumpOn,
+                [pneumoCnl_4] = channelState_PumpOn
+            },
+            [phaseRotation_3] =
+            {
+                [pneumoCnl_1] = channelState_PumpOn,
+
+                [pneumoCnl_2] = channelState_PumpOn,
+                [pneumoCnl_3] = channelState_PumpOut,
+                [pneumoCnl_4] = channelState_PumpOn
+            },
             [phaseRotation_4] =
             {
-                [pneumoCnl_1] = channelState_PumpOut,
+                [pneumoCnl_1] = channelState_Vibro,
+
+                [pneumoCnl_2] = channelState_PumpOn,
+                [pneumoCnl_3] = channelState_PumpOn,
+                [pneumoCnl_4] = channelState_PumpOut
+            },
+            [phaseRotation_5] =
+            {
+                [pneumoCnl_1] = channelState_PumpOn,
+
                 [pneumoCnl_2] = channelState_PumpOut,
-                [pneumoCnl_3] = channelState_Hold,
+                [pneumoCnl_3] = channelState_PumpOn,
+                [pneumoCnl_4] = channelState_PumpOn
+            },
+            [phaseRotation_6] =
+            {
+                [pneumoCnl_1] = channelState_Vibro,
+
+                [pneumoCnl_2] = channelState_PumpOn,
+                [pneumoCnl_3] = channelState_PumpOut,
+                [pneumoCnl_4] = channelState_PumpOn
+            },
+
+            [phaseRotation_7] =
+            {
+                [pneumoCnl_1] = channelState_PumpOn,
+
+                [pneumoCnl_2] = channelState_PumpOut,
+                [pneumoCnl_3] = channelState_PumpOn,
+                [pneumoCnl_4] = channelState_PumpOn
+            },
+            [phaseRotation_8] =
+            {
+                [pneumoCnl_1] = channelState_Vibro,
+
+                [pneumoCnl_2] = channelState_PumpOn,
+                [pneumoCnl_3] = channelState_PumpOn,
+                [pneumoCnl_4] = channelState_PumpOut
+            },
+            [phaseRotation_9] =
+            {
+                [pneumoCnl_1] = channelState_PumpOn,
+
+                [pneumoCnl_2] = channelState_PumpOn,
+                [pneumoCnl_3] = channelState_PumpOut,
+                [pneumoCnl_4] = channelState_PumpOn
+            },
+            [phaseRotation_10] =
+            {
+                [pneumoCnl_1] = channelState_Vibro,
+
+                [pneumoCnl_2] = channelState_PumpOut,
+                [pneumoCnl_3] = channelState_PumpOn,
+                [pneumoCnl_4] = channelState_PumpOn
+            },
+            [phaseRotation_11] =
+            {
+                [pneumoCnl_1] = channelState_PumpOn,
+
+                [pneumoCnl_2] = channelState_PumpOn,
+                [pneumoCnl_3] = channelState_PumpOn,
+                [pneumoCnl_4] = channelState_PumpOut
+            },
+            [phaseRotation_12] =
+            {
+                [pneumoCnl_1] = channelState_Vibro,
+
+                [pneumoCnl_2] = channelState_PumpOn,
+                [pneumoCnl_3] = channelState_PumpOut,
                 [pneumoCnl_4] = channelState_PumpOn
             }
         }
     },
-    [profile_lowLeft] =
-    {
-        .phaseChannelState =
-        {
-            [phaseRotation_1] =
-            {
-                [pneumoCnl_1] = channelState_PumpOn,
-                [pneumoCnl_2] = channelState_Hold,
-                [pneumoCnl_3] = channelState_PumpOut,
-                [pneumoCnl_4] = channelState_PumpOut
-            },
-            [phaseRotation_2] =
-            {
-                [pneumoCnl_1] = channelState_Hold,
-                [pneumoCnl_2] = channelState_PumpOut,
-                [pneumoCnl_3] = channelState_PumpOut,
-                [pneumoCnl_4] = channelState_PumpOn
-            },
-            [phaseRotation_3] =
-            {
-                [pneumoCnl_1] = channelState_PumpOut,
-                [pneumoCnl_2] = channelState_PumpOut,
-                [pneumoCnl_3] = channelState_PumpOn,
-                [pneumoCnl_4] = channelState_Hold
-            },
-            [phaseRotation_4] =
-            {
-                [pneumoCnl_1] = channelState_PumpOut,
-                [pneumoCnl_2] = channelState_PumpOn,
-                [pneumoCnl_3] = channelState_Hold,
-                [pneumoCnl_4] = channelState_PumpOut
-            }
-        }
-    },
-    [profile_mediumRight] =
-    {
-        .phaseChannelState =
-        {
-            [phaseRotation_1] =
-            {
-                [pneumoCnl_1] = channelState_PumpOn,
-                [pneumoCnl_2] = channelState_PumpOn,
-                [pneumoCnl_3] = channelState_PumpOut,
-                [pneumoCnl_4] = channelState_Hold
-            },
-            [phaseRotation_2] =
-            {
-                [pneumoCnl_1] = channelState_Hold,
-                [pneumoCnl_2] = channelState_PumpOn,
-                [pneumoCnl_3] = channelState_PumpOn,
-                [pneumoCnl_4] = channelState_PumpOut
-            },
-            [phaseRotation_3] =
-            {
-                [pneumoCnl_1] = channelState_PumpOut,
-                [pneumoCnl_2] = channelState_Hold,
-                [pneumoCnl_3] = channelState_PumpOn,
-                [pneumoCnl_4] = channelState_PumpOn
-            },
-            [phaseRotation_4] =
-            {
-                [pneumoCnl_1] = channelState_PumpOn,
-                [pneumoCnl_2] = channelState_PumpOut,
-                [pneumoCnl_3] = channelState_Hold,
-                [pneumoCnl_4] = channelState_PumpOn
-            }
-        }
-    }
 };
-
-
-//------------------------------------------------------------------------------
-/**
- * Переключает направление вращения
- */
-void switchRotation(void)
-{
-
-    if (directionRotation_right == m_directionRotation)
-    {
-        m_directionRotation = directionRotation_left;
-    }
-	else
-    if (directionRotation_left == m_directionRotation)
-    {
-        m_directionRotation = directionRotation_right;
-    }
-}
-
-//------------------------------------------------------------------------------
-/**
- * Переходит на следующий круг
- */
-void nextRound(void)
-{
-    ++m_round_cnt;
-    if (m_round_cnt > 2)
-    {
-        m_round_cnt = 0;
-        switchRotation();
-    }
-}
 
 //------------------------------------------------------------------------------
 /**
@@ -201,7 +175,6 @@ void nextPhase (void)
     if (m_phaseRotation >= phaseRotation_num)
     {
         m_phaseRotation = phaseRotation_1;
-        nextRound();
     }
 }
 
@@ -225,17 +198,9 @@ void nextPhaseHandler(void)
  */
 void phaseSwitch(void)
 {
-    profile_t profile = profile_lowRight;
-    if (directionRotation_right == m_directionRotation)
-    {
-        profile = profile_mediumRight;
-    }
-    if (directionRotation_left == m_directionRotation)
-    {
-        profile = profile_mediumRight;
-    }
+    profile_t profile = profile_roundPillow;
     pneumoCnl_t pneumoCnl = pneumoCnl_1;
-    for (; pneumoCnl< pneumoCnl_num; pneumoCnl++)
+    for (; pneumoCnl < pneumoCnl_num; pneumoCnl++)
     {
         setPneumoChannelStateTogether(pneumoCnl,
             programmProfile[profile].phaseChannelState[m_phaseRotation][pneumoCnl]);

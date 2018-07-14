@@ -24,7 +24,7 @@ typedef enum {pneumoCnl_1, pneumoCnl_2, pneumoCnl_3, pneumoCnl_4, pneumoCnl_num}
 typedef enum {pumpState_Off, pumpState_On} pumpState_t;
 typedef enum {pumpValveState_Open, pumpValveState_Close} pumpValveState_t;
 typedef enum {reliefValveState_Open, reliefValveState_Close} reliefValveState_t;
-typedef enum {channelState_PumpOut, channelState_PumpOn, channelState_Hold} channelState_t;
+typedef enum {channelState_PumpOut, channelState_PumpOn, channelState_Hold, channelState_Vibro} channelState_t;
 
 //------------------------------------------------------------------------------
 
