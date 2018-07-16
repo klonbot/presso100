@@ -127,6 +127,7 @@ void solenoidHandler(void)
 {
     createSolenoid(PORT_CHANNEL1, PIN_CHANNEL1, sol_chnl1, Bit_SET);
     createSolenoid(PORT_CHANNEL2, PIN_CHANNEL2, sol_chnl2, Bit_SET);
+/*
     createSolenoid(PORT_CHANNEL3, PIN_CHANNEL3, sol_chnl3, Bit_SET);
 
     createSolenoid(PORT_CHANNEL4, PIN_CHANNEL4, sol_chnl4, Bit_SET);
@@ -140,6 +141,7 @@ void solenoidHandler(void)
     createSolenoid(PORT_CHANNEL10, PIN_CHANNEL10, sol_chnl10, Bit_SET);
     createSolenoid(PORT_CHANNEL11, PIN_CHANNEL11, sol_chnl11, Bit_SET);
     createSolenoid(PORT_CHANNEL12, PIN_CHANNEL12, sol_chnl12, Bit_SET);
+*/
 
     xTaskCreate( solenoidTask, "buttons", configMINIMAL_STACK_SIZE, NULL, SOLENOID_PRIORITY, NULL );
 }

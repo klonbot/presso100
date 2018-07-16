@@ -309,8 +309,6 @@ void StartStop (void)
             case workMode_rotator:
                 m_current_mode = cm_working;
                 break;
-
-                
             }
             break;
         case cm_error:
@@ -652,9 +650,10 @@ void modeSwitch(void)
 void solenoidControl(void)
 {
     setSolenoidState (m_pumpValveLine[pneumoCnl_1], MINIVALVE_1);
-    setSolenoidState (m_reliefValveLine[pneumoCnl_1], RELIEFVALVE_1);
+    //setSolenoidState (m_reliefValveLine[pneumoCnl_1], RELIEFVALVE_1);
     setSolenoidState (m_pumpLine[pneumoCnl_1], PUMP_1);
 
+/*
     setSolenoidState (m_pumpValveLine[pneumoCnl_2], MINIVALVE_2);
     setSolenoidState (m_reliefValveLine[pneumoCnl_2], RELIEFVALVE_2);
     setSolenoidState (m_pumpLine[pneumoCnl_2], PUMP_2);
@@ -666,6 +665,7 @@ void solenoidControl(void)
     setSolenoidState (m_pumpValveLine[pneumoCnl_4], MINIVALVE_4);
     setSolenoidState (m_reliefValveLine[pneumoCnl_4], RELIEFVALVE_4);
     setSolenoidState (m_pumpLine[pneumoCnl_4], PUMP_4);
+*/
 }
 
 //------------------------------------------------------------------------------

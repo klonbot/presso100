@@ -16,6 +16,7 @@ typedef enum
 {
     phaseRotation_1,
     phaseRotation_2,
+/*
     phaseRotation_3,
     phaseRotation_4,
 
@@ -29,6 +30,7 @@ typedef enum
 
     phaseRotation_11,
     phaseRotation_12,
+*/
 
     phaseRotation_num
 } phaseRotation_t;
@@ -66,101 +68,12 @@ static const programmProfile_t programmProfile[profile_num] =
         {
             [phaseRotation_1] =
             {
-                [pneumoCnl_1] = channelState_PumpOn,
-
-                [pneumoCnl_2] = channelState_PumpOn,
-                [pneumoCnl_3] = channelState_PumpOn,
-                [pneumoCnl_4] = channelState_PumpOut
+                [pneumoCnl_1] = channelState_PumpOut,
             },
             [phaseRotation_2] =
             {
                 [pneumoCnl_1] = channelState_Vibro,
-
-                [pneumoCnl_2] = channelState_PumpOut,
-                [pneumoCnl_3] = channelState_PumpOn,
-                [pneumoCnl_4] = channelState_PumpOn
             },
-            [phaseRotation_3] =
-            {
-                [pneumoCnl_1] = channelState_PumpOn,
-
-                [pneumoCnl_2] = channelState_PumpOn,
-                [pneumoCnl_3] = channelState_PumpOut,
-                [pneumoCnl_4] = channelState_PumpOn
-            },
-            [phaseRotation_4] =
-            {
-                [pneumoCnl_1] = channelState_Vibro,
-
-                [pneumoCnl_2] = channelState_PumpOn,
-                [pneumoCnl_3] = channelState_PumpOn,
-                [pneumoCnl_4] = channelState_PumpOut
-            },
-            [phaseRotation_5] =
-            {
-                [pneumoCnl_1] = channelState_PumpOn,
-
-                [pneumoCnl_2] = channelState_PumpOut,
-                [pneumoCnl_3] = channelState_PumpOn,
-                [pneumoCnl_4] = channelState_PumpOn
-            },
-            [phaseRotation_6] =
-            {
-                [pneumoCnl_1] = channelState_Vibro,
-
-                [pneumoCnl_2] = channelState_PumpOn,
-                [pneumoCnl_3] = channelState_PumpOut,
-                [pneumoCnl_4] = channelState_PumpOn
-            },
-
-            [phaseRotation_7] =
-            {
-                [pneumoCnl_1] = channelState_PumpOn,
-
-                [pneumoCnl_2] = channelState_PumpOut,
-                [pneumoCnl_3] = channelState_PumpOn,
-                [pneumoCnl_4] = channelState_PumpOn
-            },
-            [phaseRotation_8] =
-            {
-                [pneumoCnl_1] = channelState_Vibro,
-
-                [pneumoCnl_2] = channelState_PumpOn,
-                [pneumoCnl_3] = channelState_PumpOn,
-                [pneumoCnl_4] = channelState_PumpOut
-            },
-            [phaseRotation_9] =
-            {
-                [pneumoCnl_1] = channelState_PumpOn,
-
-                [pneumoCnl_2] = channelState_PumpOn,
-                [pneumoCnl_3] = channelState_PumpOut,
-                [pneumoCnl_4] = channelState_PumpOn
-            },
-            [phaseRotation_10] =
-            {
-                [pneumoCnl_1] = channelState_Vibro,
-
-                [pneumoCnl_2] = channelState_PumpOut,
-                [pneumoCnl_3] = channelState_PumpOn,
-                [pneumoCnl_4] = channelState_PumpOn
-            },
-            [phaseRotation_11] =
-            {
-                [pneumoCnl_1] = channelState_PumpOn,
-
-                [pneumoCnl_2] = channelState_PumpOn,
-                [pneumoCnl_3] = channelState_PumpOn,
-                [pneumoCnl_4] = channelState_PumpOut
-            },
-            [phaseRotation_12] =
-            {
-                [pneumoCnl_1] = channelState_Vibro,
-
-                [pneumoCnl_2] = channelState_PumpOn,
-                [pneumoCnl_3] = channelState_PumpOut,
-                [pneumoCnl_4] = channelState_PumpOn
-            }
         }
     },
 };
