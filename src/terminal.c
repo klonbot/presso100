@@ -18,8 +18,11 @@
 #include "stm32f10x_usart.h"
 #include "stm32f10x_rcc.h"
 #include "stm32f10x_gpio.h"
+#include "string.h"
 
 #include "serial.h"
+#include "FreeRTOS/Demo/Common/drivers/ST/STM32F10xFWLib/inc/stm32f10x_spi.h"
+#include "mainLogic.h"
 
 
 
@@ -57,7 +60,45 @@ void terminalTxTask( void *pvParameters )
     }
 }
 
-signed char text_rx[] = "Rx\n\r";
+enum {maxSizeCommandString = 100};
+signed char commandString[maxSizeCommandString];
+bool isCommandString = FALSE;
+uint32_t szCommandString = 0;
+
+
+static void resetCommandString(void)
+{
+    szCommandString = 0;
+    isCommandString = FALSE;
+}
+
+static void setCommandStringChar(signed char comchar)
+{
+    commandString[szCommandString] = comchar;
+    ++szCommandString;
+
+    if (szCommandString >= maxSizeCommandString)
+    {
+        resetCommandString();
+    }
+
+}
+
+void processCommand(void)
+{
+    if((strncmp(commandString, "/start", 6) == 0)&&(6 == szCommandString))
+    {
+        Start();
+		resetCommandString();
+    }
+
+    if((strncmp(commandString, "/stop", 5) == 0)&&(5 == szCommandString))
+    {
+        Stop();
+		resetCommandString();
+    }
+}
+
 //------------------------------------------------------------------------------
 /**
  * Задача приема данных
@@ -69,11 +110,25 @@ void terminalRxTask( void *pvParameters )
 
     while(1)
     {
-        //vSerialPutString(m_serial, text_rx, 4 );
-        signed char RxedChar;
-        if (xSerialGetChar(m_serial, &RxedChar, 100))
+        volatile signed char RxedChar;
+        if (xSerialGetChar(m_serial, (signed char *)&RxedChar, 100))
         {
-            xSerialPutChar( m_serial, RxedChar, 100);
+            if ('/' == RxedChar)
+            {
+                resetCommandString();
+                isCommandString = TRUE;
+            }
+
+            if (TRUE == isCommandString)
+            {
+                setCommandStringChar(RxedChar);
+                processCommand();
+
+                if ((' ' == RxedChar)||('\r' == RxedChar)||('\r' == RxedChar))
+                {
+                    resetCommandString();
+                }
+            }
         }
 		vTaskDelay(1);
     }

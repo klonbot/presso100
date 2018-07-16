@@ -33,6 +33,8 @@ void mainLogicHandler(void);
 void PowerLavelUp (void);
 void PowerLavelDown (void);
 void StartStop (void);
+void Start(void);
+void Stop(void);
 
 //------------------------------------------------------------------------------
 void setPneumoChannelState(pneumoCnl_t cnl, pumpState_t pumpState,
