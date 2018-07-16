@@ -95,11 +95,11 @@ int main( void )
 
     prvSetupHardware();
 
-    buttonHandler();    // Обработчик кнопок
+    //buttonHandler();    // Обработчик кнопок
     ledHandler();       // Обработчик светодиодов
     terminalHandler();  // Обработчик терминалки
     mainLogicHandler(); // Главный обработчик логики
-    pressureHandler();  // Обработчик давления
+    //pressureHandler();  // Обработчик давления
     solenoidHandler();  // Обработчик соленоидов
 
     // Start the scheduler.

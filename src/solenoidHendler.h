@@ -23,12 +23,27 @@ extern "C" {
  */
 typedef enum
 {
-    sol_chnl1, sol_chnl2, sol_chnl3, sol_chnl4
+    sol_chnl1, sol_chnl2, sol_chnl3,
+    sol_chnl4, sol_chnl5, sol_chnl6,
+    sol_chnl7, sol_chnl8, sol_chnl9,
+    sol_chnl10, sol_chnl11, sol_chnl12
 } solenoide_t;
 
-#define MINIVALVE sol_chnl4
-#define PUMP sol_chnl3
-#define RELIEFVALVE sol_chnl2
+#define MINIVALVE_1 sol_chnl12
+#define PUMP_1 sol_chnl11
+#define RELIEFVALVE_1 sol_chnl10
+
+#define MINIVALVE_2 sol_chnl9
+#define PUMP_2 sol_chnl8
+#define RELIEFVALVE_2 sol_chnl7
+
+#define MINIVALVE_3 sol_chnl6
+#define PUMP_3 sol_chnl5
+#define RELIEFVALVE_3 sol_chnl4
+
+#define MINIVALVE_4 sol_chnl3
+#define PUMP_4 sol_chnl2
+#define RELIEFVALVE_4 sol_chnl1
 
 //------------------------------------------------------------------------------
 
