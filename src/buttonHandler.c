@@ -17,14 +17,14 @@
 
 //------------------------------------------------------------------------------
 
-#define PORT_BUTTON_UP      GPIOC
-#define PIN_BUTTON_UP       GPIO_Pin_6
+#define PORT_BUTTON_UP      GPIOB
+#define PIN_BUTTON_UP       GPIO_Pin_7
 
-#define PORT_BUTTON_DOWN    GPIOC
+#define PORT_BUTTON_DOWN    GPIOB
 #define PIN_BUTTON_DOWN     GPIO_Pin_8
 
-#define PORT_BUTTON_START   GPIOA
-#define PIN_BUTTON_START    GPIO_Pin_8
+#define PORT_BUTTON_START   GPIOB
+#define PIN_BUTTON_START    GPIO_Pin_9
 
 //------------------------------------------------------------------------------
 

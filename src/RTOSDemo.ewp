@@ -1027,7 +1027,7 @@
       <name>$PROJ_DIR$\STM32F10xFWLib\src\stm32f10x_nvic.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\STM32F10xFWLib\src\stm32f10x_rcc.c</name>
+      <name>$PROJ_DIR$\STM32F10XFWLIB\src\stm32f10x_rcc.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\STM32F10xFWLib\src\stm32f10x_spi.c</name>
@@ -1098,6 +1098,9 @@
   </file>
   <file>
     <name>$PROJ_DIR$\terminal.h</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\workModeRotator.c</name>
   </file>
 </project>
 
