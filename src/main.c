@@ -97,7 +97,7 @@ int main( void )
 
     //buttonHandler();    // Обработчик кнопок
     ledHandler();       // Обработчик светодиодов
-    //terminalHandler();  // Обработчик терминалки
+    terminalHandler();  // Обработчик терминалки
     mainLogicHandler(); // Главный обработчик логики
     //pressureHandler();  // Обработчик давления
     solenoidHandler();  // Обработчик соленоидов

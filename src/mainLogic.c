@@ -271,6 +271,22 @@ void PowerLavelDown (void)
     }
 }
 
+void Start(void)
+{
+    if (m_current_mode == cm_readyuse)
+    {
+        StartStop ();
+    }
+}
+
+void Stop(void)
+{
+    if (m_current_mode != cm_readyuse)
+    {
+        StartStop ();
+    }
+}
+
 //------------------------------------------------------------------------------
 /**
  * Нажатие кнопки запуска/остановки
@@ -290,16 +306,15 @@ void StartStop (void)
                 m_current_mode = cm_pumping;
                 break;
             case workMode_vibroTime:
+            case workMode_rotator:
                 m_current_mode = cm_working;
                 break;
+
+                
             }
             break;
         case cm_error:
-            m_current_mode = cm_readyuse;
-            break;
         case cm_pumping:
-            m_current_mode = cm_readyuse;
-            break;
         case cm_working:
             m_current_mode = cm_readyuse;
             break;
