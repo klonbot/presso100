@@ -310,7 +310,7 @@ void StartStop (void)
                 m_current_mode = cm_working;
                 break;
 
-                
+
             }
             break;
         case cm_error:
@@ -333,7 +333,6 @@ void StartStop (void)
 u32 getMaxPressure(void)
 {
     u32 maxPressure = 0;
-#if 0
     switch(PowerLevel)
     {
         case 0:
